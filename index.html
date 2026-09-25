@@ -3,635 +3,276 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Alki — Mapa del Prototipo & Mockups</title>
+<title>Alki — Bienvenida</title>
 <link rel="stylesheet" href="design-system.css">
 <style>
-body {
-  background: var(--bg-primary);
-  color: var(--text-primary);
-  font-family: var(--font-ui);
-  min-height: 100vh;
-  padding: 48px 20px 80px;
-  display: block;
-  transition: background 200ms ease, color 200ms ease;
-}
-
-.index-container {
-  max-width: 960px;
-  margin: 0 auto;
-}
-
-/* Header & Hero */
-.hero {
-  text-align: center;
-  margin-bottom: var(--sp-10);
-  position: relative;
-}
-
-.top-bar {
+/* ── Splash Specific Layout ── */
+.splash-screen {
+  flex: 1;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: var(--sp-6);
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+  background: var(--bg-primary);
 }
 
-.brand-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  text-decoration: none;
+.splash-bg {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 110% 70% at 50% 0%, var(--holst-2) 0%, var(--holst-1) 45%, var(--bg-primary) 75%),
+    radial-gradient(ellipse 80% 50% at 90% 25%, rgba(110, 158, 204, 0.25) 0%, transparent 60%);
 }
-.brand-icon {
-  width: 44px; height: 44px;
-  border-radius: var(--radius-lg);
-  background: var(--brand-primary);
-  color: var(--text-on-brand);
+
+.splash-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(44px);
+  opacity: 0.45;
+  pointer-events: none;
+}
+.splash-orb-1 {
+  width: 220px; height: 220px;
+  background: radial-gradient(circle, var(--holst-4) 0%, transparent 70%);
+  top: 40px; left: -50px;
+}
+.splash-orb-2 {
+  width: 180px; height: 180px;
+  background: radial-gradient(circle, var(--holst-5) 0%, transparent 70%);
+  top: 140px; right: -40px;
+}
+
+.splash-hero {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 52%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding-top: var(--statusbar-height);
+  z-index: 10;
+  text-align: center;
+}
+
+.splash-logo-mark {
+  width: 88px; height: 88px;
+  border-radius: var(--radius-2xl);
+  background: rgba(243, 248, 253, 0.12);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(243, 248, 253, 0.25);
   display: flex; align-items: center; justify-content: center;
-  box-shadow: 0 4px 16px rgba(53, 89, 130, 0.35);
+  box-shadow: 0 12px 32px rgba(34, 58, 94, 0.35);
+  margin-bottom: var(--sp-4);
+  color: var(--text-on-brand);
+  animation: rs-spring-drop 1000ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
-.brand-name {
-  font-family: var(--font-display);
-  font-size: 26px;
-  font-weight: 700;
-  letter-spacing: var(--tracking-tight);
-  color: var(--text-primary);
+@keyframes rs-spring-drop {
+  from { opacity: 0; transform: translateY(-30px) scale(0.88); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
 }
-.brand-name span { color: var(--brand-accent); font-style: italic; font-weight: 400; }
+@keyframes rs-rise {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes rs-card-in {
+  from { opacity: 0; transform: translateY(44px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.splash-logo-mark svg {
+  width: 48px; height: 48px;
+}
 
-.hero-title {
+.splash-title {
   font-family: var(--font-display);
-  font-size: clamp(32px, 5vw, 44px);
+  font-size: 38px;
   font-weight: 700;
   letter-spacing: var(--tracking-tight);
   line-height: var(--leading-tight);
-  color: var(--text-primary);
-  margin-bottom: var(--sp-3);
+  color: var(--text-on-brand);
+  margin-bottom: var(--sp-2);
+  animation: rs-rise 560ms cubic-bezier(0.34, 1.56, 0.64, 1) 130ms both;
+}
+.splash-title span {
+  color: var(--holst-5);
+  font-style: italic;
+  font-weight: 400;
 }
 
-.hero-subtitle {
-  font-size: var(--text-md);
-  color: var(--text-secondary);
-  max-width: 640px;
-  margin: 0 auto var(--sp-6);
-  line-height: var(--leading-relaxed);
+.splash-tagline {
+  font-family: var(--font-ui);
+  font-size: var(--text-base);
+  font-weight: 400;
+  color: var(--holst-6);
+  letter-spacing: var(--tracking-normal);
+  animation: rs-rise 560ms cubic-bezier(0.34, 1.56, 0.64, 1) 220ms both;
 }
 
-.hero-actions {
+.splash-chips {
   display: flex;
-  gap: var(--sp-3);
-  justify-content: center;
-  align-items: center;
-  flex-wrap: wrap;
-  margin-bottom: var(--sp-6);
+  gap: var(--sp-2);
+  margin-top: var(--sp-5);
 }
-
-.btn-start {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  background: var(--brand-primary);
-  color: var(--text-on-dark);
-  font-weight: 600;
-  font-size: var(--text-md);
-  padding: 14px 28px;
-  border-radius: var(--radius-full);
-  text-decoration: none;
-  box-shadow: 0 4px 20px rgba(53, 89, 130, 0.40);
-  transition: transform 100ms ease, box-shadow 100ms ease;
-}
-.btn-start:active { transform: scale(0.97); }
-
-.pill-badge {
+.splash-chip {
   display: inline-flex;
   align-items: center;
   gap: 6px;
   padding: 6px 14px;
   border-radius: var(--radius-full);
-  background: var(--bg-tertiary);
+  background: rgba(34, 58, 94, 0.45);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(243, 248, 253, 0.38);
+  font-family: var(--font-ui);
   font-size: var(--text-xs);
   font-weight: 600;
-  color: var(--text-secondary);
+  color: var(--text-on-brand);
+  box-shadow: 0 2px 8px rgba(34, 58, 94, 0.25);
+  animation: rs-rise 520ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+.splash-chip:nth-child(1) { animation-delay: 330ms; }
+.splash-chip:nth-child(2) { animation-delay: 420ms; }
+.splash-chip:nth-child(3) { animation-delay: 510ms; }
+.splash-chip svg {
+  width: 14px; height: 14px;
+  stroke: currentColor;
 }
 
-/* Sections */
-.section-block {
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-2xl);
-  overflow: hidden;
-  margin-bottom: var(--sp-8);
-  box-shadow: var(--shadow-sm);
+.btn-apple {
+  background: #000;
+  color: var(--text-on-brand);
+  font-weight: 500;
 }
+.btn-apple svg { fill: currentColor; }
 
-.section-head {
-  padding: var(--sp-4) var(--sp-6);
-  background: var(--bg-tertiary);
-  border-bottom: 1px solid var(--border-default);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-.section-head-title {
-  font-family: var(--font-display);
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--text-primary);
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.section-tag {
-  font-family: var(--font-ui);
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.8px;
-  padding: 4px 10px;
-  border-radius: var(--radius-full);
-  background: var(--brand-accent-soft);
-  color: var(--brand-primary);
-}
-
-.screens-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 1px;
-  background: var(--border-default);
-}
-
-.screen-card {
-  background: var(--bg-secondary);
-  padding: var(--sp-5);
-  text-decoration: none;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  transition: background 150ms ease;
-  position: relative;
-}
-.screen-card:hover {
-  background: var(--bg-tertiary);
-}
-.screen-card:active { transform: scale(0.99); }
-
-.card-num {
-  font-family: var(--font-display);
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--brand-primary);
-  margin-bottom: 6px;
-}
-.card-title {
-  font-family: var(--font-ui);
-  font-size: var(--text-base);
-  font-weight: 600;
-  color: var(--text-primary);
-  margin-bottom: 4px;
-}
-.card-desc {
-  font-size: var(--text-xs);
-  color: var(--text-tertiary);
-  line-height: var(--leading-normal);
-  margin-bottom: var(--sp-3);
-}
-.card-flow {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--brand-primary);
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-.card-flow svg { width: 14px; height: 14px; stroke: currentColor; }
-
-/* Flow Map Preview */
-.flow-summary {
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-2xl);
-  padding: var(--sp-6);
-  margin-bottom: var(--sp-8);
-}
-.flow-summary h2 {
-  font-family: var(--font-display);
-  font-size: 20px;
-  font-weight: 700;
-  margin-bottom: var(--sp-4);
-  color: var(--text-primary);
-}
-.flow-diagram {
+.splash-card {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  padding: 32px 28px calc(24px + var(--safe-bottom));
   display: flex;
   flex-direction: column;
   gap: var(--sp-3);
-  font-size: var(--text-sm);
-  color: var(--text-secondary);
+  z-index: 20;
+  background: var(--bg-secondary);
+  border-radius: 36px 36px 0 0;
+  box-shadow: 0 -8px 32px rgba(34, 58, 94, 0.15);
+  border-top: 1px solid var(--separator);
+  animation: rs-card-in 620ms cubic-bezier(0.22, 1, 0.36, 1) 260ms both;
 }
-.flow-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-  padding: 8px 12px;
-  background: var(--bg-tertiary);
-  border-radius: var(--radius-lg);
-}
-.flow-node {
-  font-weight: 600;
-  color: var(--text-primary);
-  text-decoration: none;
-}
-.flow-node:hover { color: var(--brand-primary); text-decoration: underline; }
-.flow-arrow { color: var(--text-tertiary); }
 
-@media (max-width: 480px) {
-  body { padding: 28px 16px 64px; }
+@media (prefers-reduced-motion: reduce) {
+  .splash-logo-mark,
+  .splash-title,
+  .splash-tagline,
+  .splash-chip,
+  .splash-card {
+    animation: rs-fade-in 200ms ease both;
+    animation-delay: 0ms !important;
+  }
+}
+
+.splash-legal {
+  text-align: center;
+  font-family: var(--font-ui);
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+  line-height: var(--leading-relaxed);
+  margin-top: var(--sp-2);
+}
+.splash-legal a {
+  color: var(--brand-primary);
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }
 </style>
 </head>
 <body>
 
-<div class="index-container">
-  
-  <!-- Top Bar -->
-  <div class="top-bar">
-    <a href="01-splash.html" class="brand-badge">
-      <div class="brand-icon">
-        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
+<div class="phone">
+  <!-- Dynamic Island -->
+  <div class="dynamic-island"></div>
+
+  <!-- Status Bar -->
+  <div class="status-bar" style="color: var(--text-on-brand);">
+    <span class="status-time">9:41</span>
+    <div class="status-icons">
+      <svg width="17" height="12" viewBox="0 0 17 12" fill="currentColor"><rect x="0" y="6" width="3" height="6" rx="0.8"/><rect x="4.5" y="4" width="3" height="8" rx="0.8"/><rect x="9" y="2" width="3" height="10" rx="0.8"/><rect x="13.5" y="0" width="3" height="12" rx="0.8"/></svg>
+      <svg width="16" height="12" viewBox="0 0 16 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M8 9.5a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3z" fill="currentColor"/><path d="M1.5 5.5C3.4 3.5 5.6 2.5 8 2.5s4.6 1 6.5 3"/><path d="M4 8C5.2 6.7 6.5 6 8 6s2.8.7 4 2"/></svg>
+      <svg width="25" height="12" viewBox="0 0 25 12" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="0" y="1" width="21" height="10" rx="2.5"/><rect x="22" y="3.5" width="2" height="5" rx="1" fill="currentColor" opacity="0.5"/><rect x="1.5" y="2.5" width="16" height="7" rx="1.5" fill="currentColor"/></svg>
+    </div>
+  </div>
+
+  <!-- Screen Content -->
+  <div class="splash-screen">
+    <div class="splash-bg">
+      <div class="splash-orb splash-orb-1"></div>
+      <div class="splash-orb splash-orb-2"></div>
+    </div>
+
+    <!-- Hero / Branding -->
+    <div class="splash-hero">
+      <div class="splash-logo-mark">
+        <!-- Custom clean SVG mark: Pin + Gear/Wrench combo -->
+        <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M24 6c-7.73 0-14 6.27-14 14 0 10.5 14 22 14 22s14-11.5 14-22c0-7.73-6.27-14-14-14z"/>
+          <circle cx="24" cy="20" r="5" stroke-dasharray="2 2"/>
+          <path d="M21 17l6 6M27 17l-6 6"/>
         </svg>
       </div>
-      <div class="brand-name">Al<span>ki</span></div>
-    </a>
-  </div>
 
-  <!-- Hero Header -->
-  <div class="hero">
-    <h1 class="hero-title">Mockups del Prototipo Móvil</h1>
-    <p class="hero-subtitle">
-      24 pantallas con arquitectura iOS nativa, proporciones de iPhone (390×844px), paleta <strong>Holst</strong>, tipografía <strong>Fraunces + Manrope</strong> y navegación conectada vía View Transitions API.
-    </p>
+      <h1 class="splash-title">Al<span>ki</span></h1>
+      <p class="splash-tagline">Alquila, ofrece, conéctate.</p>
 
-    <div class="hero-actions">
-      <a href="01-splash.html" class="btn-start">
-        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-        Iniciar Prototipo Interactivo
+      <div class="splash-chips">
+        <div class="splash-chip">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          Cerca de ti
+        </div>
+        <div class="splash-chip">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+          Herramientas
+        </div>
+        <div class="splash-chip">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          Servicios
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Actions Card -->
+    <div class="splash-card">
+      <a href="02-registro.html" class="btn btn-primary">
+        Crear cuenta
       </a>
-      <div class="pill-badge">
-        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-        Paleta Holst (7 tonos)
-      </div>
-      <div class="pill-badge">
-        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 14 14"/></svg>
-        24 Pantallas
-      </div>
-      <div class="pill-badge">
-        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-        Iconografía SVG propia
-      </div>
+
+      <div class="divider">o continúa con</div>
+
+      <a href="04-home-cliente.html" class="btn btn-secondary" style="font-weight: 500;">
+        <!-- Clean Google icon -->
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+          <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+          <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05"/>
+          <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" fill="#EA4335"/>
+        </svg>
+        Continuar con Google
+      </a>
+
+      <a href="04-home-cliente.html" class="btn btn-apple">
+        <!-- Apple icon -->
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01z"/>
+          <path d="M12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
+        </svg>
+        Continuar con Apple
+      </a>
+
+      <p class="splash-legal">
+        Al continuar, aceptas nuestros <a href="#">Términos de servicio</a> y <a href="#">Política de privacidad</a>.
+      </p>
     </div>
   </div>
-
-  <!-- Flow Summary Map -->
-  <div class="flow-summary">
-    <h2>Mapa de Flujos del Prototipo</h2>
-    <div class="flow-diagram">
-      <div class="flow-row">
-        <strong>Flujo Onboarding:</strong>
-        <a href="01-splash.html" class="flow-node">01 Splash</a>
-        <span class="flow-arrow">→</span>
-        <a href="02-registro.html" class="flow-node">02 Registro</a>
-        <span class="flow-arrow">→</span>
-        <a href="04-home-cliente.html" class="flow-node">04 Home Cliente</a>
-      </div>
-      <div class="flow-row">
-        <strong>Flujo Alquiler:</strong>
-        <a href="04-home-cliente.html" class="flow-node">04 Home</a>
-        <span class="flow-arrow">→</span>
-        <a href="05-detalle-herramienta.html" class="flow-node">05 Detalle Herramienta</a>
-        <span class="flow-arrow">→</span>
-        <a href="10-confirmacion-pago.html" class="flow-node">10 Pago</a>
-        <span class="flow-arrow">→</span>
-        <a href="11-chats-lista.html" class="flow-node">11 Chat</a>
-      </div>
-      <div class="flow-row">
-        <strong>Flujo Servicios:</strong>
-        <a href="04-home-cliente.html" class="flow-node">04 Home</a>
-        <span class="flow-arrow">→</span>
-        <a href="06-detalle-proveedor-servicio.html" class="flow-node">06 Detalle Proveedor</a>
-        <span class="flow-arrow">→</span>
-        <a href="10-confirmacion-pago.html" class="flow-node">10 Pago</a>
-        <span class="flow-arrow">→</span>
-        <a href="11-chats-lista.html" class="flow-node">11 Chat</a>
-      </div>
-      <div class="flow-row">
-        <strong>Flujo Solicitud & Ofertas:</strong>
-        <a href="07-publicar-solicitud.html" class="flow-node">07 Publicar Solicitud</a>
-        <span class="flow-arrow">→</span>
-        <a href="08-solicitud-activa.html" class="flow-node">08 Solicitud Activa</a>
-        <span class="flow-arrow">→</span>
-        <a href="09-lista-ofertas.html" class="flow-node">09 Ofertas Recibidas</a>
-        <span class="flow-arrow">→</span>
-        <a href="10-confirmacion-pago.html" class="flow-node">10 Pago</a>
-      </div>
-      <div class="flow-row">
-        <strong>Flujo Proveedor Alquiler:</strong>
-        <a href="03a-modo-proveedor.html" class="flow-node">03a Modo Proveedor</a>
-        <span class="flow-arrow">→</span>
-        <a href="03b-verificacion-identidad.html" class="flow-node">03b Verificación DNI</a>
-        <span class="flow-arrow">→</span>
-        <a href="12-home-proveedor-alquiler.html" class="flow-node">12 Home Alquiler</a>
-        <span class="flow-arrow">→</span>
-        <a href="14-enviar-oferta-alquiler.html" class="flow-node">14 Oferta</a>
-        <span class="flow-arrow">→</span>
-        <a href="15-acuerdo-qr-alquiler.html" class="flow-node">15 Acuerdo QR</a>
-      </div>
-      <div class="flow-row">
-        <strong>Flujo Proveedor Servicios:</strong>
-        <a href="16-home-proveedor-servicios.html" class="flow-node">16 Home Servicios</a>
-        <span class="flow-arrow">→</span>
-        <a href="18-enviar-oferta-servicios.html" class="flow-node">18 Oferta</a>
-        <span class="flow-arrow">→</span>
-        <a href="19-acuerdo-qr-servicios.html" class="flow-node">19 Acuerdo QR</a>
-      </div>
-    </div>
-  </div>
-
-  <!-- SECCIÓN 1: ONBOARDING -->
-  <div class="section-block">
-    <div class="section-head">
-      <div class="section-head-title">
-        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
-        Sección 1 — Onboarding & Verificación
-      </div>
-      <span class="section-tag">4 pantallas</span>
-    </div>
-    <div class="screens-grid">
-      <a href="01-splash.html" class="screen-card">
-        <div>
-          <div class="card-num">01</div>
-          <div class="card-title">Splash / Bienvenida</div>
-          <div class="card-desc">Logo Fraunces, tagline, botones crear cuenta e iniciar sesión con Google.</div>
-        </div>
-        <div class="card-flow">Ver pantalla <svg viewBox="0 0 24 24" fill="none"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>
-      </a>
-
-      <a href="02-registro.html" class="screen-card">
-        <div>
-          <div class="card-num">02</div>
-          <div class="card-title">Registro de Cliente</div>
-          <div class="card-desc">Campos iOS agrupados con floating label, toggle de contraseña y pasos.</div>
-        </div>
-        <div class="card-flow">Ver pantalla <svg viewBox="0 0 24 24" fill="none"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>
-      </a>
-
-      <a href="03a-modo-proveedor.html" class="screen-card">
-        <div>
-          <div class="card-num">03a</div>
-          <div class="card-title">Activar Modo Proveedor</div>
-          <div class="card-desc">Selector interactivo Alquiler o Servicios con tarjetas seleccionables.</div>
-        </div>
-        <div class="card-flow">Ver pantalla <svg viewBox="0 0 24 24" fill="none"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>
-      </a>
-
-      <a href="03b-verificacion-identidad.html" class="screen-card">
-        <div>
-          <div class="card-num">03b</div>
-          <div class="card-title">Verificación de Identidad</div>
-          <div class="card-desc">Selfie biométrica, visor simulado de DNI anverso/reverso y botón obturador.</div>
-        </div>
-        <div class="card-flow">Ver pantalla <svg viewBox="0 0 24 24" fill="none"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>
-      </a>
-    </div>
-  </div>
-
-  <!-- SECCIÓN 2: FLUJO CLIENTE -->
-  <div class="section-block">
-    <div class="section-head">
-      <div class="section-head-title">
-        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg>
-        Sección 2 — Flujo Cliente
-      </div>
-      <span class="section-tag">9 pantallas</span>
-    </div>
-    <div class="screens-grid">
-      <a href="04-home-cliente.html" class="screen-card">
-        <div>
-          <div class="card-num">04</div>
-          <div class="card-title">Home del Cliente</div>
-          <div class="card-desc">Switch Alquiler/Servicios, tarjetas con scroll horizontal, FAB y tab bar.</div>
-        </div>
-        <div class="card-flow">Ver pantalla <svg viewBox="0 0 24 24" fill="none"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>
-      </a>
-
-      <a href="05-detalle-herramienta.html" class="screen-card">
-        <div>
-          <div class="card-num">05</div>
-          <div class="card-title">Detalle de Herramienta</div>
-          <div class="card-desc">Carrusel interactivo scroll-snap, calendario selector de fechas y resumen de costos.</div>
-        </div>
-        <div class="card-flow">Ver pantalla <svg viewBox="0 0 24 24" fill="none"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>
-      </a>
-
-      <a href="06-detalle-proveedor-servicio.html" class="screen-card">
-        <div>
-          <div class="card-num">06</div>
-          <div class="card-title">Detalle de Proveedor</div>
-          <div class="card-desc">Hero con avatar y badge, lista de tarifas, disponibilidad y reseñas.</div>
-        </div>
-        <div class="card-flow">Ver pantalla <svg viewBox="0 0 24 24" fill="none"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>
-      </a>
-
-      <a href="07-publicar-solicitud.html" class="screen-card">
-        <div>
-          <div class="card-num">07</div>
-          <div class="card-title">Publicar Solicitud</div>
-          <div class="card-desc">Formulario con switch Alquiler/Servicio, geolocalización y fechas.</div>
-        </div>
-        <div class="card-flow">Ver pantalla <svg viewBox="0 0 24 24" fill="none"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>
-      </a>
-
-      <a href="08-solicitud-activa.html" class="screen-card">
-        <div>
-          <div class="card-num">08</div>
-          <div class="card-title">Solicitud Activa</div>
-          <div class="card-desc">Radar animado buscando proveedores, contador dinámico de ofertas recibidas.</div>
-        </div>
-        <div class="card-flow">Ver pantalla <svg viewBox="0 0 24 24" fill="none"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>
-      </a>
-
-      <a href="09-lista-ofertas.html" class="screen-card">
-        <div>
-          <div class="card-num">09</div>
-          <div class="card-title">Ofertas Recibidas</div>
-          <div class="card-desc">Banner colapsable de solicitud y tarjetas de ofertas ordenadas por rating.</div>
-        </div>
-        <div class="card-flow">Ver pantalla <svg viewBox="0 0 24 24" fill="none"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>
-      </a>
-
-      <a href="10-confirmacion-pago.html" class="screen-card">
-        <div>
-          <div class="card-num">10</div>
-          <div class="card-title">Confirmación de Pago</div>
-          <div class="card-desc">Desglose de costos (S/ 125.60), selector Tarjeta/Yape/Plin y nota de custodia.</div>
-        </div>
-        <div class="card-flow">Ver pantalla <svg viewBox="0 0 24 24" fill="none"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>
-      </a>
-
-      <a href="11-chats-lista.html" class="screen-card">
-        <div>
-          <div class="card-num">11</div>
-          <div class="card-title">Bandeja de Mensajes</div>
-          <div class="card-desc">Lista de conversaciones con avatar, último mensaje truncado, hora y badge de no leídos.</div>
-        </div>
-        <div class="card-flow">Ver pantalla <svg viewBox="0 0 24 24" fill="none"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>
-      </a>
-
-      <a href="11-chat.html?c=carlos" class="screen-card">
-        <div>
-          <div class="card-num">11b</div>
-          <div class="card-title">Conversación (Chat)</div>
-          <div class="card-desc">Burbujas iOS, banner de acuerdo confirmado y barra de entrada. Plantilla parametrizable por contacto.</div>
-        </div>
-        <div class="card-flow">Ver pantalla <svg viewBox="0 0 24 24" fill="none"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>
-      </a>
-    </div>
-  </div>
-
-  <!-- SECCIÓN 3: PROVEEDOR ALQUILER -->
-  <div class="section-block">
-    <div class="section-head">
-      <div class="section-head-title">
-        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
-        Sección 3 — Proveedor de Alquiler
-      </div>
-      <span class="section-tag">4 pantallas</span>
-    </div>
-    <div class="screens-grid">
-      <a href="12-home-proveedor-alquiler.html" class="screen-card">
-        <div>
-          <div class="card-num">12</div>
-          <div class="card-title">Home Proveedor Alquiler</div>
-          <div class="card-desc">Pestañas Mis herramientas y Solicitudes de clientes, métricas de ganancias.</div>
-        </div>
-        <div class="card-flow">Ver pantalla <svg viewBox="0 0 24 24" fill="none"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>
-      </a>
-
-      <a href="13-publicar-herramienta.html" class="screen-card">
-        <div>
-          <div class="card-num">13</div>
-          <div class="card-title">Publicar Herramienta</div>
-          <div class="card-desc">Carga de fotos múltiples, tarifas día/hora, días disponibles y toggle de entrega.</div>
-        </div>
-        <div class="card-flow">Ver pantalla <svg viewBox="0 0 24 24" fill="none"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>
-      </a>
-
-      <a href="14-enviar-oferta-alquiler.html" class="screen-card">
-        <div>
-          <div class="card-num">14</div>
-          <div class="card-title">Enviar Oferta (Alquiler)</div>
-          <div class="card-desc">Detalle de la solicitud del cliente, selector de herramienta y propuesta de precio.</div>
-        </div>
-        <div class="card-flow">Ver pantalla <svg viewBox="0 0 24 24" fill="none"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>
-      </a>
-
-      <a href="15-acuerdo-qr-alquiler.html" class="screen-card">
-        <div>
-          <div class="card-num">15</div>
-          <div class="card-title">Acuerdo Activo + QR (Alquiler)</div>
-          <div class="card-desc">Código QR SVG de entrega/devolución y estado interactivo con colores de estado.</div>
-        </div>
-        <div class="card-flow">Ver pantalla <svg viewBox="0 0 24 24" fill="none"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>
-      </a>
-    </div>
-  </div>
-
-  <!-- SECCIÓN 4: PROVEEDOR SERVICIOS -->
-  <div class="section-block">
-    <div class="section-head">
-      <div class="section-head-title">
-        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-        Sección 4 — Proveedor de Servicios
-      </div>
-      <span class="section-tag">4 pantallas</span>
-    </div>
-    <div class="screens-grid">
-      <a href="16-home-proveedor-servicios.html" class="screen-card">
-        <div>
-          <div class="card-num">16</div>
-          <div class="card-title">Home Proveedor Servicios</div>
-          <div class="card-desc">Servicios activos, solicitudes de clientes en zona y métricas de desempeño.</div>
-        </div>
-        <div class="card-flow">Ver pantalla <svg viewBox="0 0 24 24" fill="none"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>
-      </a>
-
-      <a href="17-publicar-servicio.html" class="screen-card">
-        <div>
-          <div class="card-num">17</div>
-          <div class="card-title">Publicar Disponibilidad</div>
-          <div class="card-desc">Especialidad, zona de cobertura (distritos), horarios y portafolio previo.</div>
-        </div>
-        <div class="card-flow">Ver pantalla <svg viewBox="0 0 24 24" fill="none"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>
-      </a>
-
-      <a href="18-enviar-oferta-servicios.html" class="screen-card">
-        <div>
-          <div class="card-num">18</div>
-          <div class="card-title">Enviar Oferta (Servicios)</div>
-          <div class="card-desc">Precio estimado, tiempo de ejecución, toggle de materiales incluidos.</div>
-        </div>
-        <div class="card-flow">Ver pantalla <svg viewBox="0 0 24 24" fill="none"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>
-      </a>
-
-      <a href="19-acuerdo-qr-servicios.html" class="screen-card">
-        <div>
-          <div class="card-num">19</div>
-          <div class="card-title">Acuerdo Activo + QR (Servicios)</div>
-          <div class="card-desc">Temporizador de servicio en vivo, dirección del cliente y QR de cierre.</div>
-        </div>
-        <div class="card-flow">Ver pantalla <svg viewBox="0 0 24 24" fill="none"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>
-      </a>
-    </div>
-  </div>
-
-  <!-- SECCIÓN 5: TRANSVERSALES -->
-  <div class="section-block">
-    <div class="section-head">
-      <div class="section-head-title">
-        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-        Sección 5 — Pantallas Transversales
-      </div>
-      <span class="section-tag">3 pantallas</span>
-    </div>
-    <div class="screens-grid">
-      <a href="20-perfil-usuario.html" class="screen-card">
-        <div>
-          <div class="card-num">20</div>
-          <div class="card-title">Perfil de Usuario</div>
-          <div class="card-desc">Foto, badge verificado, bio, botón activar modo proveedor, listings y reseñas.</div>
-        </div>
-        <div class="card-flow">Ver pantalla <svg viewBox="0 0 24 24" fill="none"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>
-      </a>
-
-      <a href="21-historial.html" class="screen-card">
-        <div>
-          <div class="card-num">21</div>
-          <div class="card-title">Historial de Acuerdos</div>
-          <div class="card-desc">Pestañas Cliente/Proveedor, filtros (Completados, En curso, Cancelados) y reseñas.</div>
-        </div>
-        <div class="card-flow">Ver pantalla <svg viewBox="0 0 24 24" fill="none"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>
-      </a>
-
-      <a href="22-configuracion.html" class="screen-card">
-        <div>
-          <div class="card-num">22</div>
-          <div class="card-title">Configuración</div>
-          <div class="card-desc">Ajustes de cuenta, notificaciones, métodos de pago, privacidad, idioma y cierre de sesión.</div>
-        </div>
-        <div class="card-flow">Ver pantalla <svg viewBox="0 0 24 24" fill="none"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>
-      </a>
-    </div>
-  </div>
-
 </div>
 
 <script src="shared.js"></script>

@@ -11,7 +11,7 @@
 
 **Producto:** Alki
 **Categoría:** marketplace C2C de alquiler de herramientas y contratación de servicios (Perú — soles, S/).
-**Tagline (splash `01-splash.html`):** «Alquila, ofrece, conéctate.»
+**Tagline (splash `index.html`):** «Alquila, ofrece, conéctate.»
 
 ### Paleta "Holst" (rampa cruda)
 
@@ -30,7 +30,7 @@ Rampa completa (según comentario del header del CSS):
 
 ### Logo
 
-Construido en `01-splash.html`, en dos partes:
+Construido en `index.html`, en dos partes:
 
 - **Ícono / marca (`.splash-logo-mark`):** SVG inline de 48×48 px dentro de un tile cuadrado redondeado de 88×88 px con radio `--radius-2xl` (24px). El dibujo es un "pin/ubicación" con un círculo de trazo discontinuo (`stroke-dasharray="2 2"`) y una X interior (combo pin + herramienta/servicio). Trazo `stroke="currentColor"`, `stroke-width="2"`, esquinas y extremos redondeados. El tile usa efecto vidrio (ver §3): `background: rgba(243, 248, 253, 0.12)`, `backdrop-filter: blur(20px)`, `border: 1px solid rgba(243, 248, 253, 0.25)`, `box-shadow: 0 12px 32px rgba(34, 58, 94, 0.35)`.
 - **Wordmark:** `Alki` en una tipografía **Fraunces** (`--font-display`), manteniendo el tratamiento de dos segmentos (adaptado a un nombre corto):
