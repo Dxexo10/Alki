@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Alki - Publicar Solicitud</title>
+  <link rel="stylesheet" href="design-system.css">
+  <style>
+    .content-scroll { padding: 20px; }
+    .segmented-control {
+      display: flex; background: var(--bg-secondary); padding: 4px; border-radius: 12px; margin-bottom: 16px;
+    }
+    .segmented-control label {
+      flex: 1; text-align: center; padding: 8px; font-weight: 600; font-size: 14px;
+      cursor: pointer; border-radius: 8px; display: flex; align-items: center; justify-content: center; gap: 8px;
+      color: var(--text-tertiary); transition: all 0.2s ease;
+    }
+    .segmented-control input { display: none; }
+    /* Active tab, with a distinct accent per mode (radio is immediately before its label) */
+    .segmented-control input:checked + label {
+      background: var(--brand-primary); color: var(--text-on-brand); box-shadow: var(--shadow-sm);
+    }
+    #type-servicio:checked + label {
+      background: var(--brand-success); color: var(--text-on-brand);
+    }
+
+    /* Mode context indicator */
+    .mode-context {
+      display: none; align-items: center; gap: 10px;
+      padding: 12px 14px; border-radius: 12px; margin-bottom: 16px;
+      font-size: var(--text-sm); font-weight: 600;
+    }
+    .mode-context.show { display: flex; }
+    .mode-context.rental { background: var(--brand-accent-soft); color: var(--brand-primary); }
+    .mode-context.service { background: var(--brand-success-soft); color: var(--brand-success); }
+    .mode-context svg { width: 22px; height: 22px; flex-shrink: 0; }
+
+    .select-field {
+      width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border-default);
+      background: var(--bg-primary); color: var(--text-primary); font-family: var(--font-ui);
+      font-size: 15px; box-sizing: border-box;
+    }
+    .form-group {
+      background: var(--bg-secondary); border-radius: 16px; padding: 16px; margin-bottom: 24px;
+    }
+    .form-row { margin-bottom: 16px; }
+    .form-row:last-child { margin-bottom: 0; }
+    label.field-label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 8px; color: var(--text-secondary); }
+    input[type="text"], input[type="number"], input[type="date"], textarea {
+      width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border-default);
+      background: var(--bg-primary); color: var(--text-primary); font-family: var(--font-ui);
+      box-sizing: border-box;
+    }
+    input[type="text"], input[type="number"], input[type="date"] { height: 46px; }
+    textarea { resize: vertical; }
+    .date-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .date-input { position: relative; min-width: 0; }
+    .date-input input {
+      position: relative;
+      min-width: 0;
+      box-sizing: border-box;
+      padding-right: 40px;
+      -webkit-appearance: none;
+      appearance: none;
+      font-variant-numeric: tabular-nums;
+    }
+    /* Make the whole field open the native date picker (indicator stretched, invisible) */
+    .date-input input::-webkit-calendar-picker-indicator {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      cursor: pointer;
+    }
+    .date-input svg {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 16px;
+      height: 16px;
+      color: var(--brand-primary);
+      pointer-events: none;
+    }
+    .date-input input.is-invalid + svg { color: var(--brand-error); }
+    .location-btn {
+      display: inline-flex; align-items: center; gap: 6px; color: var(--brand-primary);
+      background: transparent; border: none; font-weight: 600; padding: 0; margin-bottom: 8px; cursor: pointer;
+    }
+    /* Bottom bar uses the shared .bottom-action-bar component */
+    .btn {
+      display: flex; align-items: center; justify-content: center; width: 100%;
+      padding: 14px; border-radius: 12px; font-weight: 600; text-decoration: none; font-size: 16px; gap: 8px;
+      box-sizing: border-box; border: none; cursor: pointer; text-align: center; font-family: var(--font-ui);
+    }
+    .btn-primary { background: var(--brand-primary); color: var(--text-on-brand); }
+    .btn-secondary { background: var(--bg-secondary); color: var(--text-primary); border: 1px solid var(--text-secondary); }
+    .btn-danger { background: transparent; color: var(--brand-error); }
+    .btn-sm { padding: 8px 12px; font-size: 14px; }
+    .is-invalid { border-color: var(--brand-error) !important; }
+    .error-msg { display: none; font-size: var(--text-xs); color: var(--brand-error); font-weight: 600; margin-top: 8px; line-height: 1.35; }
+    .error-msg.show { display: block; }
+    .btn.is-disabled { opacity: 0.45; }
+  </style>
+</head>
+<body>
+  <div class="phone">
+    <div class="dynamic-island"></div>
+    <div class="status-bar" style="color: var(--text-primary);">
+      <span class="status-time">9:41</span>
+      <div class="status-icons">
+        <svg width="17" height="12" viewBox="0 0 17 12" fill="currentColor"><rect x="0" y="6" width="3" height="6" rx="0.8"/><rect x="4.5" y="4" width="3" height="8" rx="0.8"/><rect x="9" y="2" width="3" height="10" rx="0.8"/><rect x="13.5" y="0" width="3" height="12" rx="0.8"/></svg>
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M8 9.5a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3z" fill="currentColor"/><path d="M1.5 5.5C3.4 3.5 5.6 2.5 8 2.5s4.6 1 6.5 3"/><path d="M4 8C5.2 6.7 6.5 6 8 6s2.8.7 4 2"/></svg>
+        <svg width="25" height="12" viewBox="0 0 25 12" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="0" y="1" width="21" height="10" rx="2.5"/><rect x="22" y="3.5" width="2" height="5" rx="1" fill="currentColor" opacity="0.5"/><rect x="1.5" y="2.5" width="16" height="7" rx="1.5" fill="currentColor"/></svg>
+      </div>
+    </div>
+
+    <header class="nav-header">
+      <a href="04-home-cliente.html" class="nav-btn back" data-nav-back aria-label="Volver">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+      </a>
+      <h1 class="nav-title">Publicar solicitud</h1>
+      <span class="nav-btn" aria-hidden="true" style="visibility:hidden;"></span>
+    </header>
+
+    <div class="screen-content no-tabbar content-scroll">
+      <div class="segmented-control">
+        <input type="radio" name="type" id="type-alquiler" checked>
+        <label for="type-alquiler">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+          Alquiler
+        </label>
+        <input type="radio" name="type" id="type-servicio">
+        <label for="type-servicio">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          Servicio
+        </label>
+      </div>
+
+      <!-- Mode context indicator -->
+      <div class="mode-context rental show" id="modeContext">
+        <svg id="modeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></svg>
+        <span id="modeContextText">Publicando una solicitud de alquiler</span>
+      </div>
+
+      <div class="form-group">
+        <div class="form-row">
+          <label class="field-label">Descripción</label>
+          <textarea id="p-desc" rows="4" placeholder="Qué necesitas exactamente..."></textarea>
+          <div class="error-msg" id="e-desc"></div>
+        </div>
+        <div class="form-row">
+          <label class="field-label">Categoría</label>
+          <select id="p-cat" class="select-field">
+            <option value="">Selecciona una categoría</option>
+            <option value="__add">+ Agregar categoría</option>
+          </select>
+          <div class="error-msg" id="e-cat"></div>
+        </div>
+        <div class="form-row" id="newCatRow" style="display:none;">
+          <label class="field-label">Nueva categoría</label>
+          <div style="display:flex; gap:8px;">
+            <input type="text" id="p-cat-new" placeholder="Escribe una categoría nueva" style="flex:1;">
+            <button type="button" class="btn btn-secondary btn-sm" id="p-cat-add" style="width:auto; white-space:nowrap;">Añadir</button>
+          </div>
+        </div>
+        <div class="form-row">
+          <label class="field-label">Ubicación</label>
+          <button type="button" class="location-btn" id="btnLocation">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+            Usar mi ubicación actual
+          </button>
+          <input type="text" id="p-loc" placeholder="o ingresa dirección manualmente">
+          <div class="error-msg" id="e-loc"></div>
+        </div>
+        <div class="form-row">
+          <label class="field-label">Fechas</label>
+          <div class="date-row">
+            <div class="date-input">
+              <input type="date" id="p-from" aria-label="Fecha de inicio">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
+            </div>
+            <div class="date-input">
+              <input type="date" id="p-to" aria-label="Fecha de fin">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
+            </div>
+          </div>
+          <div class="error-msg" id="e-dates"></div>
+        </div>
+        <div class="form-row">
+          <label class="field-label">Presupuesto referencial (S/)</label>
+          <input type="number" id="p-budget" placeholder="0.00">
+          <div class="error-msg" id="e-budget"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bottom-action-bar">
+      <a href="08-solicitud-activa.html" class="btn btn-primary is-disabled" aria-disabled="true">Publicar solicitud</a>
+    </div>
+  </div>
+  <script src="shared.js"></script>
+  <script>
+    (function () {
+      var ICON_RENT = '<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>';
+      var ICON_SERV = '<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>';
+      var CATS = {
+        alquiler: ['Eléctrica', 'Construcción', 'Limpieza', 'Jardín'],
+        servicio: ['Electricidad', 'Gasfitería', 'Limpieza', 'Pintura', 'Carpintería']
+      };
+
+      var desc = document.getElementById('p-desc');
+      var loc = document.getElementById('p-loc');
+      var from = document.getElementById('p-from');
+      var to = document.getElementById('p-to');
+      var budget = document.getElementById('p-budget');
+      var cat = document.getElementById('p-cat');
+      var newCatRow = document.getElementById('newCatRow');
+      var newCat = document.getElementById('p-cat-new');
+      var ctx = document.getElementById('modeContext');
+      var ctxIcon = document.getElementById('modeIcon');
+      var ctxText = document.getElementById('modeContextText');
+      var btn = document.querySelector('.btn-primary');
+      var touched = {};
+
+      function mode() { return document.getElementById('type-servicio').checked ? 'servicio' : 'alquiler'; }
+
+      function fillCategories() {
+        var list = CATS[mode()] || [];
+        var html = '<option value="">Selecciona una categoría</option>';
+        list.forEach(function (c) { html += '<option value="' + c + '">' + c + '</option>'; });
+        html += '<option value="__add">+ Agregar categoría</option>';
+        cat.innerHTML = html;
+      }
+
+      function applyMode() {
+        var isService = mode() === 'servicio';
+        ctx.classList.add('show');
+        ctx.classList.toggle('service', isService);
+        ctx.classList.toggle('rental', !isService);
+        ctxIcon.innerHTML = isService ? ICON_SERV : ICON_RENT;
+        ctxText.textContent = isService ? 'Publicando una solicitud de servicio' : 'Publicando una solicitud de alquiler';
+        fillCategories();
+        newCatRow.style.display = 'none';
+        newCat.value = '';
+      }
+
+      function setBox(id, m) {
+        var box = document.getElementById(id);
+        if (m) { box.textContent = m; box.classList.add('show'); }
+        else { box.textContent = ''; box.classList.remove('show'); }
+      }
+      function datesMsg() {
+        var f = from.value.trim(), t = to.value.trim();
+        return !f ? 'Indica la fecha de inicio' : (!t ? 'Indica la fecha de fin' : '');
+      }
+      function validBudget() { return parseFloat(budget.value) > 0; }
+      function validCat() { return cat.value !== '' && cat.value !== '__add'; }
+
+      function render() {
+        var dmsg = datesMsg();
+        var ok = desc.value.trim() !== '' && loc.value.trim() !== '' && !dmsg &&
+                 validBudget() && validCat();
+
+        setBox('e-desc', (touched.desc && desc.value.trim() === '') ? 'Describe qué necesitas' : '');
+        setBox('e-loc', (touched.loc && loc.value.trim() === '') ? 'Ingresa una ubicación' : '');
+        setBox('e-dates', touched.dates ? dmsg : '');
+        setBox('e-budget', (touched.budget && !validBudget()) ? 'Ingresa un presupuesto válido' : '');
+        setBox('e-cat', (touched.cat && !validCat()) ? 'Selecciona una categoría' : '');
+
+        desc.classList.toggle('is-invalid', !!(touched.desc && desc.value.trim() === ''));
+        loc.classList.toggle('is-invalid', !!(touched.loc && loc.value.trim() === ''));
+        from.classList.toggle('is-invalid', !!(touched.dates && !from.value.trim()));
+        to.classList.toggle('is-invalid', !!(touched.dates && !to.value.trim()));
+        budget.classList.toggle('is-invalid', !!(touched.budget && !validBudget()));
+        cat.classList.toggle('is-invalid', !!(touched.cat && !validCat()));
+
+        btn.classList.toggle('is-disabled', !ok);
+        btn.setAttribute('aria-disabled', String(!ok));
+        return ok;
+      }
+
+      function addCategory() {
+        var v = newCat.value.trim();
+        if (!v) return;
+        var opt = document.createElement('option');
+        opt.value = v; opt.textContent = v;
+        cat.insertBefore(opt, cat.querySelector('option[value="__add"]'));
+        cat.value = v;
+        newCat.value = '';
+        newCatRow.style.display = 'none';
+        touched.cat = true;
+        render();
+      }
+
+      desc.addEventListener('input', render);
+      loc.addEventListener('input', render);
+      from.addEventListener('input', render);
+      to.addEventListener('input', render);
+      budget.addEventListener('input', render);
+      desc.addEventListener('blur', function () { touched.desc = true; render(); });
+      loc.addEventListener('blur', function () { touched.loc = true; render(); });
+      from.addEventListener('blur', function () { touched.dates = true; render(); });
+      to.addEventListener('blur', function () { touched.dates = true; render(); });
+      budget.addEventListener('blur', function () { touched.budget = true; render(); });
+
+      cat.addEventListener('change', function () {
+        touched.cat = true;
+        newCatRow.style.display = (cat.value === '__add') ? 'block' : 'none';
+        if (cat.value === '__add') newCat.focus();
+        render();
+      });
+      newCat.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); addCategory(); } });
+      document.getElementById('p-cat-add').addEventListener('click', addCategory);
+
+      document.querySelectorAll('input[name="type"]').forEach(function (r) {
+        r.addEventListener('change', function () { applyMode(); touched.cat = false; render(); });
+      });
+
+      btn.addEventListener('click', function (e) {
+        if (!render()) {
+          touched.desc = touched.loc = touched.dates = touched.budget = touched.cat = true;
+          render();
+          e.preventDefault();
+          e.stopPropagation();
+          return;
+        }
+        e.preventDefault();
+        e.stopPropagation();
+        if (window.rsShowToast) window.rsShowToast('Solicitud publicada');
+        setTimeout(function () { window.location.href = '08-solicitud-activa.html'; }, 1300);
+      });
+
+      document.getElementById('btnLocation').addEventListener('click', function () {
+        loc.value = 'Av. Alfredo Benavides 5440, Santiago de Surco 15039';
+        touched.loc = true;
+        render();
+      });
+
+      applyMode();
+      render();
+    })();
+  </script>
+</body>
+</html>

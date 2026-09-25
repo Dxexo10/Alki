@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Alki - Verificación de Identidad</title>
+  <link rel="stylesheet" href="design-system.css">
+  <style>
+    .progress-bar-container {
+      position: absolute;
+      top: calc(var(--statusbar-height) + var(--header-height));
+      left: 0; right: 0;
+      width: 100%; height: 4px; background: var(--bg-tertiary); z-index: 100;
+    }
+    .progress-bar {
+      height: 100%; width: 40%; background: var(--brand-primary); border-radius: 0 4px 4px 0;
+    }
+
+    .content-area { padding: 24px 20px; }
+    
+    .page-title { font-family: var(--font-display, serif); font-size: 24px; font-weight: 700; color: var(--text-primary); text-align: center; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .page-title svg { color: var(--brand-primary); }
+    .page-subtitle { font-size: 15px; color: var(--text-secondary); text-align: center; line-height: 1.4; margin-bottom: 32px; }
+
+    .steps-list { display: flex; flex-direction: column; gap: 24px; margin-bottom: 32px; position: relative; }
+    .steps-list::before {
+      content: ''; position: absolute; left: 15px; top: 32px; bottom: 32px;
+      width: 2px; background: var(--bg-tertiary); z-index: 0;
+    }
+
+    .step-item { display: flex; gap: 16px; position: relative; z-index: 1; }
+    
+    .step-number {
+      width: 32px; height: 32px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 700; flex-shrink: 0;
+      background: var(--bg-tertiary); color: var(--text-secondary);
+      border: 2px solid var(--bg-primary);
+    }
+    
+    .step-item.completed .step-number { background: var(--brand-success); color: var(--text-on-brand); }
+    .step-item.current .step-number { background: var(--brand-primary); color: var(--text-on-brand); }
+    
+    .step-content { flex: 1; padding-bottom: 8px; }
+    .step-title { font-size: 16px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px; }
+    .step-item.locked .step-title { color: var(--text-tertiary); }
+    .step-desc { font-size: 14px; color: var(--text-secondary); line-height: 1.4; }
+    
+    .step-header-flex { display: flex; justify-content: space-between; align-items: flex-start; }
+    .status-badge {
+      background: var(--brand-success-soft); color: var(--brand-success);
+      font-size: 11px; font-weight: 600; padding: 4px 8px; border-radius: 12px;
+      margin-top: 8px; display: inline-block;
+    }
+    .preview-circle {
+      width: 48px; height: 48px; border-radius: 50%;
+      background: var(--bg-tertiary);
+      border: 2px solid var(--bg-secondary); box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+      display: flex; align-items: center; justify-content: center; color: var(--text-tertiary);
+    }
+
+    .camera-box {
+      margin-top: 16px; width: 100%; height: 160px;
+      background: var(--brand-accent-soft); border: 2px dashed var(--brand-primary);
+      border-radius: 16px; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 8px;
+      color: var(--brand-primary);
+    }
+    .camera-text { font-size: 14px; font-weight: 500; }
+
+    .shutter-btn-container { display: flex; justify-content: center; margin-top: 16px; }
+    .shutter-btn {
+      width: 64px; height: 64px; border-radius: 50%;
+      border: 4px solid var(--bg-tertiary); background: transparent;
+      display: flex; align-items: center; justify-content: center;
+      padding: 4px; cursor: pointer;
+    }
+    .shutter-btn-inner { width: 100%; height: 100%; border-radius: 50%; background: var(--brand-primary); }
+    .shutter-btn:active { transform: scale(0.95); }
+
+    .info-card {
+      background: var(--bg-secondary); border-radius: 12px;
+      padding: 16px; display: flex; gap: 12px; align-items: flex-start;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08); margin-top: 16px;
+      color: var(--text-secondary);
+    }
+    .info-card p { font-size: 13px; line-height: 1.4; margin: 0; }
+    .info-card svg { color: var(--text-tertiary); flex-shrink: 0; }
+
+    /* Bottom bar uses the shared .bottom-action-bar component */
+    .btn {
+      width: 100%; height: 54px; background: var(--brand-primary);
+      border-radius: 16px; border: none; text-decoration: none; display: flex; align-items: center; justify-content: center;
+      color: var(--text-on-brand); font-size: 17px; font-weight: 600; font-family: var(--font-ui, sans-serif);
+      transition: all 0.2s ease;
+    }
+    .btn:active { transform: scale(0.97); }
+    .btn.is-disabled { opacity: 0.45; }
+    .camera-box.captured {
+      border-style: solid; border-color: var(--brand-success);
+      background: var(--brand-success-soft); color: var(--brand-success);
+    }
+    .capture-hint { text-align: center; font-size: var(--text-xs); color: var(--brand-error); font-weight: 600; margin-top: var(--sp-3); }
+    .capture-hint.hidden { display: none; }
+
+    .step-body { display: none; }
+    .step-item.current .step-body,
+    .step-item.completed .step-body { display: block; animation: step-in 280ms ease both; }
+    @keyframes step-in {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .step-item.current .step-body,
+      .step-item.completed .step-body { animation: none; }
+    }
+    .optional-tag {
+      display: inline-block; margin-left: 6px; vertical-align: middle;
+      font-size: 10px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase;
+      color: var(--text-tertiary); background: var(--bg-tertiary);
+      border-radius: var(--radius-full); padding: 2px 8px;
+    }
+    .skip-link {
+      display: block; margin: 14px auto 0; padding: 0;
+      background: none; border: none; cursor: pointer;
+      color: var(--brand-primary); font-family: var(--font-ui);
+      font-size: var(--text-sm); font-weight: 600;
+      text-decoration: underline; text-underline-offset: 2px;
+    }
+  </style>
+</head>
+<body>
+  <div class="phone">
+    <div class="dynamic-island"></div>
+    <div class="status-bar" style="color: var(--text-primary);">
+      <span class="status-time">9:41</span>
+      <div class="status-icons">
+        <svg width="17" height="12" viewBox="0 0 17 12" fill="currentColor"><rect x="0" y="6" width="3" height="6" rx="0.8"/><rect x="4.5" y="4" width="3" height="8" rx="0.8"/><rect x="9" y="2" width="3" height="10" rx="0.8"/><rect x="13.5" y="0" width="3" height="12" rx="0.8"/></svg>
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M8 9.5a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3z" fill="currentColor"/><path d="M1.5 5.5C3.4 3.5 5.6 2.5 8 2.5s4.6 1 6.5 3"/><path d="M4 8C5.2 6.7 6.5 6 8 6s2.8.7 4 2"/></svg>
+        <svg width="25" height="12" viewBox="0 0 25 12" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="0" y="1" width="21" height="10" rx="2.5"/><rect x="22" y="3.5" width="2" height="5" rx="1" fill="currentColor" opacity="0.5"/><rect x="1.5" y="2.5" width="16" height="7" rx="1.5" fill="currentColor"/></svg>
+      </div>
+    </div>
+
+    <header class="nav-header">
+      <a href="03a-modo-proveedor.html" class="nav-btn back" data-nav-back aria-label="Volver">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+      </a>
+      <h1 class="nav-title">Verifica tu identidad</h1>
+      <span class="nav-btn" aria-hidden="true" style="visibility:hidden;"></span>
+    </header>
+    <div class="progress-bar-container">
+      <div class="progress-bar"></div>
+    </div>
+
+    <div class="screen-content no-tabbar content-area">
+      <h1 class="page-title">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+        Verifica tu identidad
+      </h1>
+      <p class="page-subtitle">Necesitamos confirmar que eres tú. Tus datos están protegidos.</p>
+
+      <div class="steps-list">
+        <!-- Step 1 -->
+        <div class="step-item completed">
+          <div class="step-number">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+          </div>
+          <div class="step-content">
+            <div class="step-header-flex">
+              <div>
+                <div class="step-title">Selfie biométrica</div>
+                <div class="step-desc">Toma una selfie mirando de frente a la cámara</div>
+                <div class="status-badge">Completado</div>
+              </div>
+              <div class="preview-circle">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="step-item current" id="step2">
+          <div class="step-number" id="num2">2</div>
+          <div class="step-content">
+            <div class="step-title">DNI — anverso</div>
+            <div class="step-desc">Fotografía la parte delantera de tu DNI</div>
+            <div class="step-body">
+              <div class="camera-box" id="cam2">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+                <div class="camera-text" id="txt2">Apunta al anverso de tu DNI</div>
+              </div>
+              <div class="shutter-btn-container">
+                <div class="shutter-btn" data-shutter="2"><div class="shutter-btn-inner"></div></div>
+              </div>
+              <div class="capture-hint hidden" id="hint2">Captura la foto del DNI para continuar</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="step-item locked" id="step3">
+          <div class="step-number" id="num3">3</div>
+          <div class="step-content">
+            <div class="step-title">DNI — reverso</div>
+            <div class="step-desc">Fotografía la parte trasera de tu DNI</div>
+            <div class="step-body">
+              <div class="camera-box" id="cam3">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+                <div class="camera-text" id="txt3">Apunta al reverso de tu DNI</div>
+              </div>
+              <div class="shutter-btn-container">
+                <div class="shutter-btn" data-shutter="3"><div class="shutter-btn-inner"></div></div>
+              </div>
+              <div class="capture-hint hidden" id="hint3">Captura la foto del reverso del DNI para continuar</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 4 (opcional, solo si eligió Proveedor de Alquiler) -->
+        <div class="step-item locked" id="step4">
+          <div class="step-number" id="num4">4</div>
+          <div class="step-content">
+            <div class="step-title">Fotos del equipo (si aplica)<span class="optional-tag">Opcional</span></div>
+            <div class="step-desc">Agrega fotos de las herramientas que pondrás en alquiler</div>
+            <div class="step-body">
+              <div class="camera-box" id="cam4">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                <div class="camera-text" id="txt4">Toma una foto del equipo</div>
+              </div>
+              <div class="shutter-btn-container">
+                <div class="shutter-btn" data-shutter="4"><div class="shutter-btn-inner"></div></div>
+              </div>
+              <div class="capture-hint hidden" id="hint4">Captura una foto o usa "Omitir por ahora"</div>
+              <button type="button" class="skip-link" id="skip4">Omitir por ahora</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+        <p>Tus datos son tratados con máxima privacidad según la Ley N° 29733 de Protección de Datos.</p>
+      </div>
+    </div>
+
+    <div class="bottom-action-bar">
+      <a href="12-home-proveedor-alquiler.html" class="btn btn-primary is-disabled" aria-disabled="true">Continuar al Modo Proveedor</a>
+    </div>
+  </div>
+  <script src="shared.js"></script>
+  <script>
+    (function () {
+      var CHECK = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+
+      var mode = '';
+      try { mode = localStorage.getItem('alki-provider-mode') || ''; } catch (e) {}
+      // Step 4 only applies to the rental flow (or when no mode is known).
+      var onlyServices = /service/.test(mode) && !/rent/.test(mode);
+
+      var steps = {
+        2: { item: document.getElementById('step2'), num: document.getElementById('num2'), cam: document.getElementById('cam2'), txt: document.getElementById('txt2'), hint: document.getElementById('hint2') },
+        3: { item: document.getElementById('step3'), num: document.getElementById('num3'), cam: document.getElementById('cam3'), txt: document.getElementById('txt3'), hint: document.getElementById('hint3') },
+        4: { item: document.getElementById('step4'), num: document.getElementById('num4'), cam: document.getElementById('cam4'), txt: document.getElementById('txt4'), hint: document.getElementById('hint4') }
+      };
+      var order = onlyServices ? [2, 3] : [2, 3, 4];
+      var btn = document.querySelector('.btn-primary');
+      var bar = document.querySelector('.progress-bar');
+      var done = {};
+
+      if (onlyServices) steps[4].item.style.display = 'none';
+      btn.setAttribute('href', onlyServices ? '16-home-proveedor-servicios.html' : '12-home-proveedor-alquiler.html');
+
+      function updateProgress() {
+        var n = order.filter(function (i) { return done[i]; }).length;
+        bar.style.width = Math.min(40 + n * (60 / order.length), 100) + '%';
+      }
+      function maybeEnable() {
+        var ready = !!done[2] && !!done[3];
+        btn.classList.toggle('is-disabled', !ready);
+        btn.setAttribute('aria-disabled', String(!ready));
+        return ready;
+      }
+      function complete(n) {
+        var s = steps[n];
+        s.item.classList.remove('current');
+        s.item.classList.add('completed');
+        s.num.innerHTML = CHECK;
+        s.hint.classList.add('hidden');
+        done[n] = true;
+        updateProgress();
+      }
+      function capture(n, msg) {
+        var s = steps[n];
+        s.cam.classList.add('captured');
+        s.txt.textContent = msg;
+        complete(n);
+        var next = order[order.indexOf(n) + 1];
+        if (next != null) {
+          var s2 = steps[next];
+          s2.item.classList.remove('locked');
+          s2.item.classList.add('current');
+          s2.num.textContent = String(next);
+        }
+        maybeEnable();
+      }
+
+      order.forEach(function (n) {
+        var s = steps[n];
+        var shutter = s.item.querySelector('[data-shutter]');
+        if (shutter) shutter.addEventListener('click', function () {
+          capture(n, n === 4 ? 'Foto del equipo capturada' : 'DNI capturado correctamente');
+        });
+      });
+
+      var skip = document.getElementById('skip4');
+      if (skip) skip.addEventListener('click', function () {
+        complete(4);
+        maybeEnable();
+      });
+
+      btn.addEventListener('click', function (e) {
+        if (!maybeEnable()) {
+          var current = order.filter(function (n) { return steps[n].item.classList.contains('current'); })[0];
+          if (current != null) steps[current].hint.classList.remove('hidden');
+          e.preventDefault();
+          e.stopPropagation();
+        }
+      });
+
+      // Initial state: step 2 is the active one.
+      steps[2].item.classList.add('current');
+      updateProgress();
+      maybeEnable();
+    })();
+  </script>
+</body>
+</html>

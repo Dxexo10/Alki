@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Alki — Publicar Herramienta</title>
+<link rel="stylesheet" href="design-system.css">
+<style>
+/* ── Publish Tool Styles ── */
+.form-content {
+  padding: var(--sp-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+}
+
+.photo-scroll-strip {
+  display: flex;
+  gap: var(--sp-3);
+  overflow-x: auto;
+  padding: var(--sp-2) 0;
+  scrollbar-width: none;
+}
+.photo-scroll-strip::-webkit-scrollbar { display: none; }
+
+.photo-slot {
+  width: 80px; height: 80px;
+  border-radius: var(--radius-lg);
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 100ms ease;
+  position: relative;
+}
+.photo-slot:active { transform: scale(0.95); }
+.photo-slot.filled {
+  background: linear-gradient(135deg, var(--holst-2), var(--holst-1));
+  color: var(--text-on-brand);
+}
+.photo-slot.empty {
+  border: 1.5px dashed var(--border-default);
+  background: var(--bg-secondary);
+  color: var(--text-tertiary);
+}
+.photo-slot.empty:hover {
+  border-color: var(--brand-primary);
+  color: var(--brand-primary);
+}
+
+.cal-days-chips {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+  margin-top: var(--sp-2);
+}
+.day-chip-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 8px 0;
+  border-radius: var(--radius-md);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-default);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+.day-chip-input { display: none; }
+.day-chip-input:checked + .day-chip-label {
+  background: var(--brand-primary);
+  border-color: var(--brand-primary);
+  color: var(--text-on-dark);
+}
+
+.is-invalid { box-shadow: inset 0 0 0 1.5px var(--brand-error); border-radius: var(--radius-sm); }
+.error-msg { display: none; font-size: var(--text-xs); color: var(--brand-error); font-weight: 600; padding: 6px var(--sp-4) 0; }
+.error-msg.show { display: block; }
+.btn.is-disabled { opacity: 0.45; }
+</style>
+</head>
+<body>
+
+<div class="phone">
+  <!-- Dynamic Island -->
+  <div class="dynamic-island"></div>
+
+  <!-- Status Bar -->
+  <div class="status-bar" style="color: var(--text-primary);">
+    <span class="status-time">9:41</span>
+    <div class="status-icons">
+      <svg width="17" height="12" viewBox="0 0 17 12" fill="currentColor"><rect x="0" y="6" width="3" height="6" rx="0.8"/><rect x="4.5" y="4" width="3" height="8" rx="0.8"/><rect x="9" y="2" width="3" height="10" rx="0.8"/><rect x="13.5" y="0" width="3" height="12" rx="0.8"/></svg>
+      <svg width="16" height="12" viewBox="0 0 16 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M8 9.5a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3z" fill="currentColor"/><path d="M1.5 5.5C3.4 3.5 5.6 2.5 8 2.5s4.6 1 6.5 3"/><path d="M4 8C5.2 6.7 6.5 6 8 6s2.8.7 4 2"/></svg>
+      <svg width="25" height="12" viewBox="0 0 25 12" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="0" y="1" width="21" height="10" rx="2.5"/><rect x="22" y="3.5" width="2" height="5" rx="1" fill="currentColor" opacity="0.5"/><rect x="1.5" y="2.5" width="16" height="7" rx="1.5" fill="currentColor"/></svg>
+    </div>
+  </div>
+
+  <!-- Nav Header -->
+  <header class="nav-header">
+    <a href="12-home-proveedor-alquiler.html" class="nav-btn" data-nav-back aria-label="Volver">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+    </a>
+    <h1 class="nav-title">Nueva Herramienta</h1>
+    <span class="nav-btn" aria-hidden="true" style="visibility:hidden;"></span>
+  </header>
+
+  <!-- Screen Content -->
+  <div class="screen-content no-tabbar">
+    <div class="form-content">
+      
+      <!-- Photo upload strip -->
+      <div>
+        <div class="section-title" style="margin-bottom:2px;">Fotos del equipo</div>
+        <div style="font-size:var(--text-xs); color:var(--text-tertiary); margin-bottom:var(--sp-2);">Añade hasta 5 fotos (la primera será la portada)</div>
+        
+        <div class="photo-scroll-strip">
+          <div class="photo-slot filled">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+            <span style="font-size:10px; margin-top:4px;">Portada</span>
+          </div>
+          <div class="photo-slot empty">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </div>
+          <div class="photo-slot empty">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </div>
+          <div class="photo-slot empty">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main info card -->
+      <div class="card card-grouped">
+        <div class="card-row">
+          <input type="text" id="h-name" placeholder="Nombre (ej. Taladro Percutor Bosch 18V)" value="Taladro Percutor Inalámbrico Bosch 18V">
+        </div>
+        <div class="error-msg" id="e-name"></div>
+        <div class="card-row">
+          <input type="text" id="h-cat" placeholder="Categoría" value="Herramientas eléctricas">
+        </div>
+        <div class="error-msg" id="e-cat"></div>
+        <div class="card-row" style="height:auto; padding:var(--sp-3) var(--sp-4);">
+          <textarea rows="3" placeholder="Describe el estado, accesorios incluidos y recomendaciones de uso...">Incluye 2 baterías de 4.0Ah con cargador rápido y maletín de transporte rígido.</textarea>
+        </div>
+        <div class="card-row">
+          <span style="font-size:var(--text-sm); color:var(--text-secondary); width:80px;">Estado</span>
+          <input type="text" value="Excelente (como nuevo)">
+        </div>
+      </div>
+
+      <!-- Pricing Card -->
+      <div class="card card-grouped">
+        <div class="card-row">
+          <span style="font-size:var(--text-sm); color:var(--text-secondary); width:130px;">Precio por día</span>
+          <span style="font-weight:700; color:var(--brand-primary); margin-right:4px;">S/</span>
+          <input type="number" id="h-price" value="35" style="font-weight:600;">
+        </div>
+        <div class="error-msg" id="e-price"></div>
+        <div class="card-row">
+          <span style="font-size:var(--text-sm); color:var(--text-secondary); width:130px;">Precio por hora</span>
+          <span style="font-weight:700; color:var(--brand-primary); margin-right:4px;">S/</span>
+          <input type="number" value="8" placeholder="Opcional">
+        </div>
+        <div class="card-row">
+          <span style="font-size:var(--text-sm); color:var(--text-secondary); width:130px;">Garantía sugerida</span>
+          <span style="font-weight:700; color:var(--brand-primary); margin-right:4px;">S/</span>
+          <input type="number" value="50" placeholder="Opcional">
+        </div>
+      </div>
+
+      <!-- Availability -->
+      <div class="card" style="padding:var(--sp-4);">
+        <div style="font-weight:600; font-size:var(--text-sm); color:var(--text-primary); margin-bottom:4px;">Días disponibles para entrega</div>
+        <div class="cal-days-chips">
+          <div><input type="checkbox" id="d-lun" class="day-chip-input" checked><label for="d-lun" class="day-chip-label">Lun</label></div>
+          <div><input type="checkbox" id="d-mar" class="day-chip-input" checked><label for="d-mar" class="day-chip-label">Mar</label></div>
+          <div><input type="checkbox" id="d-mie" class="day-chip-input" checked><label for="d-mie" class="day-chip-label">Mié</label></div>
+          <div><input type="checkbox" id="d-jue" class="day-chip-input" checked><label for="d-jue" class="day-chip-label">Jue</label></div>
+          <div><input type="checkbox" id="d-vie" class="day-chip-input" checked><label for="d-vie" class="day-chip-label">Vie</label></div>
+          <div><input type="checkbox" id="d-sab" class="day-chip-input" checked><label for="d-sab" class="day-chip-label">Sáb</label></div>
+          <div><input type="checkbox" id="d-dom" class="day-chip-input"><label for="d-dom" class="day-chip-label">Dom</label></div>
+        </div>
+      </div>
+
+      <!-- Delivery toggle -->
+      <div class="card card-row" style="justify-content:space-between;">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--brand-primary)" stroke-width="2"><rect x="1" y="3" width="15" height="13" rx="1"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+          <div>
+            <div style="font-size:var(--text-sm); font-weight:600; color:var(--text-primary);">Ofrezco entrega a domicilio</div>
+            <div style="font-size:11px; color:var(--text-tertiary);">Puedes coordinar costo adicional de flete</div>
+          </div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" checked>
+          <span class="toggle-track"><span class="toggle-thumb"></span></span>
+        </label>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Fixed Bottom Bar -->
+  <div class="bottom-action-bar">
+    <a href="12-home-proveedor-alquiler.html" class="btn btn-primary is-disabled" aria-disabled="true">
+      Publicar herramienta
+    </a>
+  </div>
+</div>
+
+<script src="shared.js"></script>
+<script>
+  (function () {
+    var name = document.getElementById('h-name');
+    var cat = document.getElementById('h-cat');
+    var price = document.getElementById('h-price');
+    var btn = document.querySelector('.btn-primary');
+    var touched = {};
+
+    function set(el, id, m) {
+      var box = document.getElementById(id);
+      el.classList.toggle('is-invalid', !!m);
+      if (m) { box.textContent = m; box.classList.add('show'); }
+      else { box.textContent = ''; box.classList.remove('show'); }
+    }
+
+    function render() {
+      var okName = name.value.trim() !== '';
+      var okCat = cat.value.trim() !== '';
+      var okPrice = parseFloat(price.value) > 0;
+      var ok = okName && okCat && okPrice;
+
+      set(name, 'e-name', (touched.name && !okName) ? 'Ingresa un nombre' : '');
+      set(cat, 'e-cat', (touched.cat && !okCat) ? 'Ingresa una categoría' : '');
+      set(price, 'e-price', (touched.price && !okPrice) ? 'Ingresa un precio válido' : '');
+
+      btn.classList.toggle('is-disabled', !ok);
+      btn.setAttribute('aria-disabled', String(!ok));
+      return ok;
+    }
+
+    [{ el: name, k: 'name' }, { el: cat, k: 'cat' }, { el: price, k: 'price' }].forEach(function (f) {
+      f.el.addEventListener('input', render);
+      f.el.addEventListener('blur', function () { touched[f.k] = true; render(); });
+    });
+    btn.addEventListener('click', function (e) {
+      if (!render()) {
+        touched.name = touched.cat = touched.price = true;
+        render();
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+      }
+      e.preventDefault();
+      e.stopPropagation();
+      try {
+        var list = JSON.parse(localStorage.getItem('alki-tools') || '[]');
+        list.push({
+          title: name.value.trim(),
+          category: cat.value.trim(),
+          price: parseFloat(price.value) || 0,
+          state: 'Disponible'
+        });
+        localStorage.setItem('alki-tools', JSON.stringify(list));
+      } catch (err) {}
+      if (window.rsShowToast) window.rsShowToast('Herramienta publicada');
+      setTimeout(function () { window.location.href = '12-home-proveedor-alquiler.html'; }, 1300);
+    });
+    render();
+  })();
+</script>
+</body>
+</html>

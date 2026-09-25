@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Alki - Solicitud Activa</title>
+  <link rel="stylesheet" href="design-system.css">
+  <style>
+    .content-scroll {
+      padding: 20px 20px 40px; display: flex; flex-direction: column; align-items: center; text-align: center;
+    }
+    
+    .radar-container {
+      position: relative; width: 120px; height: 120px; display: flex; align-items: center; justify-content: center;
+      margin: 40px 0 24px;
+    }
+    .pulse-ring {
+      position: absolute; border-radius: 50%; background: var(--brand-primary); opacity: 0;
+      animation: pulse 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+      width: 100%; height: 100%; top: 0; left: 0;
+    }
+    .pulse-ring:nth-child(2) { animation-delay: 0.6s; }
+    .pulse-ring:nth-child(3) { animation-delay: 1.2s; }
+    @keyframes pulse {
+      0% { transform: scale(0.5); opacity: 0.5; }
+      100% { transform: scale(2); opacity: 0; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .pulse-ring { animation: none; opacity: 0; }
+    }
+    .pin-icon { z-index: 2; color: var(--brand-primary); background: var(--bg-primary); border-radius: 50%; padding: 8px; display: flex; align-items: center; justify-content: center; }
+
+    .status-text { font-size: 18px; font-weight: 600; margin-bottom: 8px; }
+    .sub-text { font-size: 14px; color: var(--text-secondary); margin-bottom: 40px; }
+    
+    .offers-count { font-family: var(--font-display); font-size: 64px; font-weight: 700; color: var(--brand-primary); line-height: 1; margin-bottom: 8px; }
+    
+    .btn {
+      display: flex; align-items: center; justify-content: center; width: 100%;
+      padding: 14px; border-radius: 12px; font-weight: 600; text-decoration: none; font-size: 16px; gap: 8px;
+      box-sizing: border-box; border: none; cursor: pointer; text-align: center; font-family: var(--font-ui); margin-bottom: 12px;
+    }
+    .btn-primary { background: var(--brand-primary); color: var(--text-on-brand); }
+    .btn-danger { background: transparent; color: var(--brand-error); border: none; }
+  </style>
+</head>
+<body>
+  <div class="phone">
+    <div class="dynamic-island"></div>
+    <div class="status-bar" style="color: var(--text-primary);">
+      <span class="status-time">9:41</span>
+      <div class="status-icons">
+        <svg width="17" height="12" viewBox="0 0 17 12" fill="currentColor"><rect x="0" y="6" width="3" height="6" rx="0.8"/><rect x="4.5" y="4" width="3" height="8" rx="0.8"/><rect x="9" y="2" width="3" height="10" rx="0.8"/><rect x="13.5" y="0" width="3" height="12" rx="0.8"/></svg>
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M8 9.5a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3z" fill="currentColor"/><path d="M1.5 5.5C3.4 3.5 5.6 2.5 8 2.5s4.6 1 6.5 3"/><path d="M4 8C5.2 6.7 6.5 6 8 6s2.8.7 4 2"/></svg>
+        <svg width="25" height="12" viewBox="0 0 25 12" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="0" y="1" width="21" height="10" rx="2.5"/><rect x="22" y="3.5" width="2" height="5" rx="1" fill="currentColor" opacity="0.5"/><rect x="1.5" y="2.5" width="16" height="7" rx="1.5" fill="currentColor"/></svg>
+      </div>
+    </div>
+
+    <header class="nav-header">
+      <a href="04-home-cliente.html" class="nav-btn back" data-nav-back aria-label="Volver">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+      </a>
+      <h1 class="nav-title">Solicitud activa</h1>
+      <span class="nav-btn" aria-hidden="true" style="visibility:hidden;"></span>
+    </header>
+
+    <div class="screen-content no-tabbar content-scroll">
+      <div class="radar-container">
+        <div class="pulse-ring"></div>
+        <div class="pulse-ring"></div>
+        <div class="pulse-ring"></div>
+        <div class="pin-icon">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+        </div>
+      </div>
+      
+      <div class="status-text">Buscando proveedores cercanos...</div>
+      <div class="sub-text">Enviamos tu solicitud a los proveedores de tu zona</div>
+      
+      <div class="offers-count">3</div>
+      <div class="status-text" style="margin-bottom:40px;">ofertas recibidas</div>
+
+      <div style="width: 100%; margin-top: auto;">
+        <a href="09-lista-ofertas.html" class="btn btn-primary">Ver ofertas (3)</a>
+        <a href="04-home-cliente.html" class="btn btn-danger" style="border:none;">Cancelar solicitud</a>
+      </div>
+    </div>
+  </div>
+  <script src="shared.js"></script>
+</body>
+</html>

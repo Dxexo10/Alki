@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Alki - Activar Modo Proveedor</title>
+  <link rel="stylesheet" href="design-system.css">
+  <style>
+    .content-area { padding: 24px 20px; }
+    
+    .illustration {
+      width: 64px; height: 64px; border-radius: 50%;
+      background: var(--brand-accent-soft); color: var(--brand-primary);
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 20px;
+    }
+    .page-title { font-family: var(--font-display, serif); font-size: 24px; font-weight: 700; color: var(--text-primary); text-align: center; margin-bottom: 8px; }
+    .page-subtitle { font-size: 15px; color: var(--text-secondary); text-align: center; line-height: 1.4; margin-bottom: 32px; }
+
+    .cards-container { display: flex; flex-direction: column; gap: 16px; margin-bottom: 24px; }
+    
+    .card-label {
+      display: block; position: relative; cursor: pointer;
+      background: var(--bg-secondary); border-radius: 20px;
+      padding: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+      border: 2px solid transparent; transition: all 0.2s ease;
+    }
+    .card-label:active { transform: scale(0.97); }
+    
+    input[type="checkbox"] { display: none; }
+    input[type="checkbox"]:checked + .card-label {
+      border-color: var(--brand-primary); background: var(--brand-accent-soft);
+    }
+    input[type="checkbox"]:checked + .card-label .checkbox-circle {
+      background: var(--brand-primary); border-color: var(--brand-primary);
+    }
+    input[type="checkbox"]:checked + .card-label .checkbox-circle::after {
+      content: ''; position: absolute; top: 6px; left: 5px;
+      width: 10px; height: 5px; border-left: 2px solid var(--text-on-brand); border-bottom: 2px solid var(--text-on-brand);
+      transform: rotate(-45deg);
+    }
+
+    .card-content { display: flex; gap: 16px; }
+    .card-icon {
+      width: 48px; height: 48px; border-radius: 12px;
+      background: var(--brand-accent-soft); color: var(--brand-primary);
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .card-info { flex: 1; }
+    .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+    .card-title { font-size: 16px; font-weight: 600; color: var(--text-primary); }
+    .checkbox-circle {
+      width: 24px; height: 24px; border-radius: 50%;
+      border: 2px solid var(--text-tertiary); position: relative; transition: all 0.2s ease;
+    }
+    .card-desc { font-size: 14px; color: var(--text-secondary); line-height: 1.4; margin-bottom: 12px; }
+    .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+    .tag {
+      font-size: 11px; font-weight: 500; color: var(--text-secondary);
+      background: var(--bg-tertiary); padding: 4px 8px; border-radius: 12px;
+    }
+
+    .info-note {
+      background: var(--brand-warning-soft); border-radius: var(--radius-lg);
+      padding: var(--sp-3) var(--sp-4); display: flex; gap: var(--sp-3); align-items: flex-start;
+      box-shadow: var(--shadow-xs); color: var(--text-primary);
+    }
+    .info-note svg { flex-shrink: 0; width: 20px; height: 20px; color: var(--brand-warning); }
+    .info-text { font-size: var(--text-sm); font-weight: 500; line-height: 1.45; color: var(--text-secondary); min-width: 0; }
+
+    .error-msg { color: var(--brand-error); font-size: var(--text-xs); font-weight: 600; margin-top: var(--sp-2); }
+    .card-label.is-invalid { border-color: var(--brand-error); }
+
+    /* Bottom bar uses the shared .bottom-action-bar component */
+    .btn {
+      width: 100%; height: 54px; background: var(--brand-primary);
+      border-radius: 16px; border: none; text-decoration: none; display: flex; align-items: center; justify-content: center;
+      color: var(--text-on-brand); font-size: 17px; font-weight: 600;
+      transition: all 0.2s ease; font-family: var(--font-ui, sans-serif);
+    }
+    .btn:active { transform: scale(0.97); }
+    .btn.is-disabled { opacity: 0.45; }
+  </style>
+</head>
+<body>
+  <div class="phone">
+    <div class="dynamic-island"></div>
+    <div class="status-bar" style="color: var(--text-primary);">
+      <span class="status-time">9:41</span>
+      <div class="status-icons">
+        <svg width="17" height="12" viewBox="0 0 17 12" fill="currentColor"><rect x="0" y="6" width="3" height="6" rx="0.8"/><rect x="4.5" y="4" width="3" height="8" rx="0.8"/><rect x="9" y="2" width="3" height="10" rx="0.8"/><rect x="13.5" y="0" width="3" height="12" rx="0.8"/></svg>
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M8 9.5a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3z" fill="currentColor"/><path d="M1.5 5.5C3.4 3.5 5.6 2.5 8 2.5s4.6 1 6.5 3"/><path d="M4 8C5.2 6.7 6.5 6 8 6s2.8.7 4 2"/></svg>
+        <svg width="25" height="12" viewBox="0 0 25 12" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="0" y="1" width="21" height="10" rx="2.5"/><rect x="22" y="3.5" width="2" height="5" rx="1" fill="currentColor" opacity="0.5"/><rect x="1.5" y="2.5" width="16" height="7" rx="1.5" fill="currentColor"/></svg>
+      </div>
+    </div>
+
+    <header class="nav-header">
+      <a href="04-home-cliente.html" class="nav-btn back" data-nav-back aria-label="Volver">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+      </a>
+      <h1 class="nav-title">Modo Proveedor</h1>
+      <span class="nav-btn" aria-hidden="true" style="visibility:hidden;"></span>
+    </header>
+
+    <div class="screen-content no-tabbar content-area">
+      <div class="illustration">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"></path><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"></path><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"></path><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"></path></svg>
+      </div>
+      <h1 class="page-title">Elige cómo quieres ofrecer</h1>
+      <p class="page-subtitle">Puedes activar uno o ambos modos. Tu identidad será verificada antes de publicar.</p>
+
+      <div class="cards-container">
+        <div>
+          <input type="checkbox" id="provider-rent" name="provider-mode">
+          <label class="card-label" for="provider-rent">
+            <div class="card-content">
+              <div class="card-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg>
+              </div>
+              <div class="card-info">
+                <div class="card-header">
+                  <div class="card-title">Proveedor de Alquiler</div>
+                  <div class="checkbox-circle"></div>
+                </div>
+                <div class="card-desc">Publica tus herramientas y equipos para que otros los alquilen por días u horas.</div>
+                <div class="tags">
+                  <span class="tag">Taladros</span>
+                  <span class="tag">Compresoras</span>
+                  <span class="tag">Drones</span>
+                </div>
+              </div>
+            </div>
+          </label>
+        </div>
+
+        <div>
+          <input type="checkbox" id="provider-service" name="provider-mode">
+          <label class="card-label" for="provider-service">
+            <div class="card-content">
+              <div class="card-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 18v-2a4 4 0 0 1 4-4h12a4 4 0 0 1 4 4v2"></path><path d="M12 12v-2"></path><path d="M8 2h8a4 4 0 0 1 4 4v2a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a4 4 0 0 1 4-4z"></path></svg>
+              </div>
+              <div class="card-info">
+                <div class="card-header">
+                  <div class="card-title">Proveedor de Servicios</div>
+                  <div class="checkbox-circle"></div>
+                </div>
+                <div class="card-desc">Ofrece tus habilidades técnicas: electricista, gasfitero, pintor, limpieza y más.</div>
+                <div class="tags">
+                  <span class="tag">Electricidad</span>
+                  <span class="tag">Gasfitería</span>
+                  <span class="tag">Pintura</span>
+                </div>
+              </div>
+            </div>
+          </label>
+        </div>
+      </div>
+
+      <div class="error-msg" id="mode-error">Selecciona al menos un modo para continuar</div>
+
+      <div class="info-note">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+        <div class="info-text">Se verificará tu identidad (DNI + selfie) antes de poder publicar. El proceso toma 2–5 minutos.</div>
+      </div>
+    </div>
+
+    <div class="bottom-action-bar">
+      <a href="03b-verificacion-identidad.html" class="btn btn-primary is-disabled" id="btn-continuar" aria-disabled="true">Continuar</a>
+    </div>
+  </div>
+  <script src="shared.js"></script>
+  <script>
+    (function () {
+      var boxes = document.querySelectorAll('input[name="provider-mode"]');
+      var labels = document.querySelectorAll('.card-label');
+      var btn = document.getElementById('btn-continuar');
+      var err = document.getElementById('mode-error');
+      var touched = false;
+
+      function any() { return Array.prototype.some.call(boxes, function (b) { return b.checked; }); }
+      function render() {
+        var ok = any();
+        btn.classList.toggle('is-disabled', !ok);
+        btn.setAttribute('aria-disabled', String(!ok));
+        err.style.display = (!ok && touched) ? 'block' : 'none';
+        labels.forEach(function (l) { l.classList.toggle('is-invalid', !ok && touched); });
+        return ok;
+      }
+
+      boxes.forEach(function (b) { b.addEventListener('change', function () { touched = true; render(); }); });
+      btn.addEventListener('click', function (e) {
+        if (!render()) {
+          touched = true; render(); e.preventDefault(); e.stopPropagation(); return;
+        }
+        try {
+          var modes = Array.prototype.filter.call(boxes, function (b) { return b.checked; })
+            .map(function (b) { return b.getAttribute('id').replace('provider-', ''); });
+          localStorage.setItem('alki-provider-mode', modes.join(',') || '1');
+        } catch (err) {}
+      });
+      render();
+    })();
+  </script>
+</body>
+</html>

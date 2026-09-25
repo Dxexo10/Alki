@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Alki - Registro de Cliente</title>
+  <link rel="stylesheet" href="design-system.css">
+  <style>
+    .content-area { padding: 24px 20px; display: flex; flex-direction: column; gap: 24px; }
+    
+    .progress-container { display: flex; flex-direction: column; align-items: center; }
+    .progress-track { display: flex; align-items: center; justify-content: space-between; width: 100%; position: relative; margin-bottom: 8px; }
+    .progress-line { position: absolute; top: 50%; left: 0; right: 0; height: 2px; background: var(--bg-tertiary); transform: translateY(-50%); z-index: 1; }
+    .progress-step { width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; z-index: 2; background: var(--bg-tertiary); color: var(--text-tertiary); }
+    .progress-step.active { background: var(--brand-primary); color: var(--text-on-brand); }
+    .progress-step.done { background: var(--brand-success); color: var(--text-on-brand); }
+    .progress-step.done svg { width: 13px; height: 13px; }
+    .progress-labels { display: flex; justify-content: space-between; width: 100%; font-size: 12px; color: var(--text-secondary); font-weight: 500; }
+    .progress-labels span.active { color: var(--brand-primary); font-weight: 600; }
+    .progress-labels span.done { color: var(--brand-success); }
+
+    .step-panel { display: none; }
+    .step-panel.active { display: block; animation: step-in 260ms ease both; }
+    @keyframes step-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    @media (prefers-reduced-motion: reduce) { .step-panel.active { animation: none; } }
+
+    .code-input { letter-spacing: 8px; font-weight: 700; font-size: 18px; }
+
+    /* Success modal */
+    .modal-overlay {
+      position: absolute; inset: 0;
+      background: rgba(34, 58, 94, 0.45);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      display: none; align-items: center; justify-content: center;
+      padding: var(--sp-6);
+      z-index: 400;
+    }
+    .modal-overlay.show { display: flex; }
+    .modal-card {
+      background: var(--bg-secondary);
+      border-radius: var(--radius-2xl);
+      padding: var(--sp-6);
+      width: 100%; max-width: 320px;
+      text-align: center;
+      box-shadow: var(--shadow-lg);
+      animation: modal-pop 420ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+    }
+    @keyframes modal-pop {
+      from { opacity: 0; transform: scale(0.86) translateY(10px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    @media (prefers-reduced-motion: reduce) { .modal-card { animation: none; } }
+    .modal-check {
+      width: 76px; height: 76px; border-radius: 50%;
+      background: var(--brand-success-soft); color: var(--brand-success);
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto var(--sp-4);
+    }
+    .modal-check svg { width: 40px; height: 40px; }
+    .modal-title { font-family: var(--font-display); font-size: var(--text-xl); font-weight: 700; color: var(--text-primary); margin-bottom: var(--sp-2); }
+    .modal-text { font-size: var(--text-sm); color: var(--text-secondary); line-height: var(--leading-relaxed); margin-bottom: var(--sp-5); }
+    
+    .subtitle { text-align: center; font-size: 14px; color: var(--text-secondary); }
+    
+    .form-container { display: flex; flex-direction: column; gap: 24px; }
+    .field-group { background: var(--bg-secondary); border-radius: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); overflow: hidden; display: flex; flex-direction: column; }
+    .field-wrapper { position: relative; display: flex; align-items: center; height: 56px; padding: 0 16px; border-bottom: 1px solid var(--bg-tertiary); background: var(--bg-secondary); }
+    .field-wrapper:last-child { border-bottom: none; }
+    .field-group > .field-wrapper:nth-last-child(2) { border-bottom: none; }
+    .field-icon { color: var(--text-secondary); margin-right: 12px; display: flex; align-items: center; }
+    .field-input-container { flex: 1; position: relative; display: flex; flex-direction: column; justify-content: center; height: 100%; }
+    .floating-label { position: absolute; left: 0; top: 50%; transform: translateY(-50%); font-size: 15px; color: var(--text-tertiary); pointer-events: none; transition: all 0.2s ease; }
+    .field-input { width: 100%; border: none; background: transparent; outline: none; color: var(--text-primary); font-size: 15px; font-family: inherit; padding-top: 14px; height: 100%; }
+    .field-input:focus ~ .floating-label, .field-input:not(:placeholder-shown) ~ .floating-label { top: 14px; font-size: 11px; color: var(--brand-primary); }
+    .field-input:not(:focus):not(:placeholder-shown) ~ .floating-label { color: var(--text-secondary); }
+    
+    .phone-prefix { display: flex; align-items: center; background: var(--bg-tertiary); padding: 4px 8px; border-radius: 12px; margin-right: 12px; font-size: 14px; font-weight: 500; gap: 4px; color: var(--text-primary); }
+    
+    .password-toggle { display: none; }
+    .password-toggle-label { cursor: pointer; color: var(--text-secondary); padding: 8px; display: flex; align-items: center; }
+    
+    .btn { width: 100%; height: 54px; border-radius: 16px; border: none; font-family: var(--font-ui, sans-serif); font-size: 17px; font-weight: 600; display: flex; align-items: center; justify-content: center; cursor: pointer; text-decoration: none; transition: transform 0.1s, opacity 0.2s; }
+    .btn:active { transform: scale(0.97); }
+    .btn-primary { background: var(--brand-primary); color: var(--text-on-brand); box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+    .btn.is-disabled { opacity: 0.45; }
+    .field-wrapper.has-error { border-bottom-color: var(--brand-error); }
+    .error-msg { display: none; font-size: 11px; color: var(--brand-error); font-weight: 500; padding: 6px 16px 10px 48px; }
+    .error-msg.show { display: block; }
+    
+    .divider { display: flex; align-items: center; text-align: center; color: var(--text-secondary); font-size: 13px; margin: 24px 0; }
+    .divider::before, .divider::after { content: ''; flex: 1; border-bottom: 1px solid var(--bg-tertiary); }
+    .divider::before { margin-right: 16px; }
+    .divider::after { margin-left: 16px; }
+    
+    .btn-google { background: var(--bg-secondary); color: var(--text-primary); border: 1px solid var(--bg-tertiary); gap: 12px; }
+    
+    .legal-text { font-size: 11px; color: var(--text-tertiary); text-align: center; line-height: 1.4; padding: 0 16px; }
+    .login-link { display: block; text-align: center; font-size: 14px; font-weight: 500; color: var(--text-secondary); text-decoration: none; }
+    .login-link span { color: var(--brand-primary); font-weight: 600; }
+  </style>
+</head>
+<body>
+  <div class="phone">
+    <div class="dynamic-island"></div>
+    <div class="status-bar" style="color: var(--text-primary);">
+      <span class="status-time">9:41</span>
+      <div class="status-icons">
+        <svg width="17" height="12" viewBox="0 0 17 12" fill="currentColor"><rect x="0" y="6" width="3" height="6" rx="0.8"/><rect x="4.5" y="4" width="3" height="8" rx="0.8"/><rect x="9" y="2" width="3" height="10" rx="0.8"/><rect x="13.5" y="0" width="3" height="12" rx="0.8"/></svg>
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M8 9.5a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3z" fill="currentColor"/><path d="M1.5 5.5C3.4 3.5 5.6 2.5 8 2.5s4.6 1 6.5 3"/><path d="M4 8C5.2 6.7 6.5 6 8 6s2.8.7 4 2"/></svg>
+        <svg width="25" height="12" viewBox="0 0 25 12" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="0" y="1" width="21" height="10" rx="2.5"/><rect x="22" y="3.5" width="2" height="5" rx="1" fill="currentColor" opacity="0.5"/><rect x="1.5" y="2.5" width="16" height="7" rx="1.5" fill="currentColor"/></svg>
+      </div>
+    </div>
+
+    <header class="nav-header">
+      <a href="01-splash.html" class="nav-btn back" data-nav-back aria-label="Volver">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+      </a>
+      <h1 class="nav-title">Crear cuenta</h1>
+      <span class="nav-btn" aria-hidden="true" style="visibility:hidden;"></span>
+    </header>
+
+    <div class="screen-content no-tabbar content-area">
+      <div class="progress-container">
+        <div class="progress-track">
+          <div class="progress-line"></div>
+          <div class="progress-step active" id="dot1" data-num="1">1</div>
+          <div class="progress-step" id="dot2" data-num="2">2</div>
+          <div class="progress-step" id="dot3" data-num="3">3</div>
+        </div>
+        <div class="progress-labels">
+          <span class="active" id="lab1">Datos</span>
+          <span id="lab2">Verificar</span>
+          <span id="lab3">Listo</span>
+        </div>
+      </div>
+
+      <!-- PASO 1: DATOS -->
+      <div class="step-panel active" id="panelDatos">
+      <p class="subtitle">Completa tus datos para comenzar</p>
+
+      <div class="form-container">
+        <div class="field-group">
+          <div class="field-wrapper">
+            <div class="field-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+            </div>
+            <div class="field-input-container">
+              <input type="text" id="f-name" class="field-input" placeholder=" ">
+              <label class="floating-label">Nombre completo</label>
+            </div>
+          </div>
+          <div class="error-msg" id="e-name"></div>
+          
+          <div class="field-wrapper">
+            <div class="field-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+            </div>
+            <div class="field-input-container">
+              <input type="email" id="f-email" class="field-input" placeholder=" ">
+              <label class="floating-label">Correo electrónico</label>
+            </div>
+          </div>
+          <div class="error-msg" id="e-email"></div>
+
+          <div class="field-wrapper">
+            <div class="phone-prefix">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path><line x1="4" y1="22" x2="4" y2="15"></line></svg>
+              +51
+            </div>
+            <div class="field-input-container">
+              <input type="tel" id="f-phone" class="field-input" placeholder=" ">
+              <label class="floating-label">Número de celular</label>
+            </div>
+          </div>
+          <div class="error-msg" id="e-phone"></div>
+
+          <div class="field-wrapper">
+            <div class="field-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+            </div>
+            <div class="field-input-container">
+              <input type="password" id="f-pass" class="field-input" placeholder=" ">
+              <label class="floating-label">Contraseña</label>
+            </div>
+            <label class="password-toggle-label">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+            </label>
+          </div>
+          <div class="error-msg" id="e-pass"></div>
+        </div>
+
+        <div>
+          <button type="button" class="btn btn-primary is-disabled" id="btnDatos" aria-disabled="true">Registrarme</button>
+          <div class="divider">o continúa con</div>
+          <a href="04-home-cliente.html" class="btn btn-google">
+            <svg width="20" height="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+              <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+              <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+              <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+              <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+            </svg>
+            Google
+          </a>
+        </div>
+
+        <p class="legal-text">
+          Al registrarte aceptas nuestros Términos y Condiciones y Política de Privacidad
+        </p>
+        <a href="04-home-cliente.html" class="login-link">
+          ¿Ya tienes cuenta? <span>Inicia sesión</span>
+        </a>
+      </div>
+      </div><!-- /panelDatos -->
+
+      <!-- PASO 2: VERIFICAR -->
+      <div class="step-panel" id="panelVerificar">
+        <p class="subtitle">Ingresa el código de 6 dígitos que enviamos a tu correo y celular.</p>
+
+        <div class="field-group">
+          <div class="field-wrapper">
+            <div class="field-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            </div>
+            <div class="field-input-container">
+              <input type="text" id="f-code" class="field-input code-input" inputmode="numeric" maxlength="6" placeholder=" ">
+              <label class="floating-label">Código de verificación</label>
+            </div>
+          </div>
+          <div class="error-msg" id="e-code"></div>
+        </div>
+
+        <div>
+          <button type="button" class="btn btn-primary is-disabled" id="btnVerificar" aria-disabled="true">Verificar</button>
+          <button type="button" class="btn btn-ghost" id="btnAtras" style="margin-top:12px;">Atrás</button>
+        </div>
+
+        <p class="legal-text" style="margin-top:16px;">¿No recibiste el código? <a href="#" style="color:var(--brand-primary); font-weight:600;">Reenviar</a></p>
+      </div>
+    </div>
+
+    <!-- SUCCESS MODAL -->
+    <div class="modal-overlay" id="successModal" aria-hidden="true">
+      <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+        <div class="modal-check">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <h2 class="modal-title" id="modalTitle">¡Cuenta creada!</h2>
+        <p class="modal-text">Bienvenido a Alki. Tu cuenta está lista para que empieces a alquilar y ofrecer tus servicios.</p>
+        <a href="04-home-cliente.html" class="btn btn-primary">Empezar</a>
+      </div>
+    </div>
+  </div>
+  <script src="shared.js"></script>
+  <script>
+    (function () {
+      var EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      var CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+
+      var fields = [
+        { el: document.getElementById('f-name'), box: 'e-name', key: 'name',
+          msg: function (el) { return el.value.trim() ? '' : 'Ingresa tu nombre completo'; } },
+        { el: document.getElementById('f-email'), box: 'e-email', key: 'email',
+          msg: function (el) { var v = el.value.trim(); return !v ? 'Ingresa tu correo' : (EMAIL.test(v) ? '' : 'Correo no válido'); } },
+        { el: document.getElementById('f-phone'), box: 'e-phone', key: 'phone',
+          msg: function (el) { var v = el.value.trim(); return !v ? 'Ingresa tu celular' : (/^\d{9}$/.test(v) ? '' : 'Debe tener 9 dígitos'); } },
+        { el: document.getElementById('f-pass'), box: 'e-pass', key: 'pass',
+          msg: function (el) { return !el.value ? 'Crea una contraseña' : (el.value.length >= 8 ? '' : 'Mínimo 8 caracteres'); } }
+      ];
+      var touched = {};
+      var btnDatos = document.getElementById('btnDatos');
+
+      function show(f, m) {
+        var wrap = f.el.closest('.field-wrapper');
+        var box = document.getElementById(f.box);
+        if (m) { wrap.classList.add('has-error'); box.textContent = m; box.classList.add('show'); }
+        else { wrap.classList.remove('has-error'); box.textContent = ''; box.classList.remove('show'); }
+      }
+      function renderDatos() {
+        var ok = true;
+        fields.forEach(function (f) {
+          var m = f.msg(f.el);
+          if (m) ok = false;
+          show(f, touched[f.key] ? m : '');
+        });
+        btnDatos.classList.toggle('is-disabled', !ok);
+        btnDatos.setAttribute('aria-disabled', String(!ok));
+        return ok;
+      }
+
+      /* Step 2 — verification code */
+      var code = document.getElementById('f-code');
+      var btnVerificar = document.getElementById('btnVerificar');
+      var codeTouched = false;
+      function validCode() { return /^\d{6}$/.test(code.value.trim()); }
+      function renderCode() {
+        var msg = !code.value.trim() ? 'Ingresa el código recibido' : 'El código debe tener 6 dígitos';
+        var wrap = code.closest('.field-wrapper');
+        var box = document.getElementById('e-code');
+        if (codeTouched && !validCode()) { wrap.classList.add('has-error'); box.textContent = msg; box.classList.add('show'); }
+        else { wrap.classList.remove('has-error'); box.textContent = ''; box.classList.remove('show'); }
+        btnVerificar.classList.toggle('is-disabled', !validCode());
+        btnVerificar.setAttribute('aria-disabled', String(!validCode()));
+        return validCode();
+      }
+
+      /* Stepper */
+      var dots = [document.getElementById('dot1'), document.getElementById('dot2'), document.getElementById('dot3')];
+      var labs = [document.getElementById('lab1'), document.getElementById('lab2'), document.getElementById('lab3')];
+      var panelDatos = document.getElementById('panelDatos');
+      var panelVerificar = document.getElementById('panelVerificar');
+      var scroller = document.querySelector('.content-area');
+
+      function setDot(el, state) {
+        el.classList.toggle('active', state === 'active');
+        el.classList.toggle('done', state === 'done');
+        if (state === 'done') el.innerHTML = CHECK;
+        else el.textContent = el.getAttribute('data-num');
+      }
+      function setLab(el, state) {
+        el.classList.toggle('active', state === 'active');
+        el.classList.toggle('done', state === 'done');
+      }
+      function paint(a, b, c) {
+        setDot(dots[0], a); setDot(dots[1], b); setDot(dots[2], c);
+        setLab(labs[0], a === 'done' ? 'done' : a);
+        setLab(labs[1], b === 'done' ? 'done' : b);
+        setLab(labs[2], c === 'done' ? 'done' : c);
+      }
+
+      function goStep(n) {
+        panelDatos.classList.toggle('active', n === 1);
+        panelVerificar.classList.toggle('active', n === 2);
+        if (n === 1) paint('active', 'idle', 'idle');
+        else paint('done', 'active', 'idle');
+        scroller.scrollTop = 0;
+      }
+
+      function success() {
+        paint('done', 'done', 'done');
+        var m = document.getElementById('successModal');
+        m.classList.add('show');
+        m.setAttribute('aria-hidden', 'false');
+      }
+
+      /* Wiring */
+      fields.forEach(function (f) {
+        f.el.addEventListener('input', renderDatos);
+        f.el.addEventListener('blur', function () { touched[f.key] = true; renderDatos(); });
+      });
+      btnDatos.addEventListener('click', function () {
+        if (!renderDatos()) {
+          fields.forEach(function (f) { touched[f.key] = true; });
+          renderDatos();
+          return;
+        }
+        goStep(2);
+        setTimeout(function () { code.focus(); }, 80);
+      });
+
+      code.addEventListener('input', function () {
+        code.value = code.value.replace(/\D/g, '').slice(0, 6);
+        renderCode();
+      });
+      code.addEventListener('blur', function () { codeTouched = true; renderCode(); });
+      btnVerificar.addEventListener('click', function () {
+        if (!renderCode()) { codeTouched = true; renderCode(); return; }
+        success();
+      });
+      document.getElementById('btnAtras').addEventListener('click', function () { goStep(1); });
+
+      goStep(1);
+      renderDatos();
+      renderCode();
+    })();
+  </script>
+</body>
+</html>

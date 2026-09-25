@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Alki — Detalle de Herramienta</title>
+<link rel="stylesheet" href="design-system.css">
+<style>
+/* ── Tool Detail Specific Styles ── */
+.floating-nav {
+  position: absolute;
+  top: calc(var(--statusbar-height) + 6px);
+  left: 0; right: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 var(--sp-4);
+  z-index: 100;
+  pointer-events: none;
+}
+.floating-btn {
+  width: 36px; height: 36px;
+  border-radius: var(--radius-full);
+  background: rgba(34, 58, 94, 0.55);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: var(--text-on-brand);
+  border: 1px solid rgba(255,255,255,0.20);
+  display: flex; align-items: center; justify-content: center;
+  pointer-events: auto;
+  cursor: pointer;
+  text-decoration: none;
+  transition: transform 100ms ease, background 150ms ease;
+}
+.floating-btn:active { transform: scale(0.92); }
+.floating-btn svg { width: 18px; height: 18px; stroke: currentColor; }
+.floating-btn.is-fav { color: var(--brand-error); border-color: var(--brand-error); }
+.floating-btn.is-fav svg { fill: var(--brand-error); stroke: var(--brand-error); }
+
+/* Carousel Hero */
+.carousel-wrapper {
+  position: relative;
+  width: 100%;
+  height: 280px;
+  background: var(--holst-1);
+}
+.carousel-track {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.carousel-track::-webkit-scrollbar { display: none; }
+.carousel-slide {
+  flex-shrink: 0;
+  width: 100%;
+  height: 100%;
+  scroll-snap-align: start;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-on-brand);
+}
+.carousel-dots-overlay {
+  position: absolute;
+  bottom: 24px;
+  left: 0; right: 0;
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  z-index: 10;
+  pointer-events: none;
+}
+
+/* Detail Sheet */
+.detail-sheet {
+  position: relative;
+  margin-top: -20px;
+  border-radius: 28px 28px 0 0;
+  background: var(--bg-primary);
+  padding: var(--sp-5) var(--sp-4) var(--sp-6);
+  box-shadow: 0 -4px 24px rgba(34, 58, 94, 0.12);
+  z-index: 20;
+}
+
+.detail-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-3);
+}
+.detail-title {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: var(--tracking-snug);
+  color: var(--text-primary);
+  line-height: var(--leading-tight);
+}
+.detail-price-box {
+  text-align: right;
+  flex-shrink: 0;
+}
+.detail-price-main {
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--brand-primary);
+}
+.detail-price-sub {
+  font-family: var(--font-ui);
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+  font-weight: 500;
+}
+
+.detail-meta-row {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  font-family: var(--font-ui);
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  margin-bottom: var(--sp-4);
+}
+.detail-meta-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.detail-meta-item svg { width: 14px; height: 14px; }
+
+.detail-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  margin-bottom: var(--sp-5);
+}
+
+/* Calendar Week Selector */
+.cal-week {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+  margin-top: var(--sp-3);
+}
+.cal-day {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 0;
+  border-radius: var(--radius-md);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-default);
+  font-family: var(--font-ui);
+  transition: transform 100ms ease;
+  cursor: pointer;
+}
+.cal-day:active { transform: scale(0.94); }
+.cal-day-name { font-size: 10px; color: var(--text-tertiary); font-weight: 600; text-transform: uppercase; }
+.cal-day-num { font-size: 14px; font-weight: 700; color: var(--text-primary); margin-top: 2px; }
+.cal-day.selected {
+  background: var(--brand-primary);
+  border-color: var(--brand-primary);
+}
+.cal-day.selected .cal-day-name,
+.cal-day.selected .cal-day-num { color: var(--text-on-dark); }
+.cal-day.disabled {
+  opacity: 0.40;
+  pointer-events: none;
+  text-decoration: line-through;
+}
+
+/* Cost Breakdown Card */
+.cost-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-xl);
+  padding: var(--sp-4);
+  margin-top: var(--sp-4);
+  box-shadow: var(--shadow-sm);
+}
+.cost-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  padding: 6px 0;
+}
+.cost-row.total {
+  border-top: 1px dashed var(--separator-strong);
+  margin-top: 6px;
+  padding-top: 10px;
+  font-size: var(--text-md);
+  font-weight: 700;
+  color: var(--brand-primary);
+}
+.cost-row.total span:last-child {
+  font-family: var(--font-display);
+  font-size: 20px;
+}
+</style>
+</head>
+<body>
+
+<div class="phone">
+  <!-- Dynamic Island -->
+  <div class="dynamic-island"></div>
+
+  <!-- Status Bar (White on Hero Photo) -->
+  <div class="status-bar" style="color: var(--text-on-brand);">
+    <span class="status-time">9:41</span>
+    <div class="status-icons">
+      <svg width="17" height="12" viewBox="0 0 17 12" fill="currentColor"><rect x="0" y="6" width="3" height="6" rx="0.8"/><rect x="4.5" y="4" width="3" height="8" rx="0.8"/><rect x="9" y="2" width="3" height="10" rx="0.8"/><rect x="13.5" y="0" width="3" height="12" rx="0.8"/></svg>
+      <svg width="16" height="12" viewBox="0 0 16 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M8 9.5a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3z" fill="currentColor"/><path d="M1.5 5.5C3.4 3.5 5.6 2.5 8 2.5s4.6 1 6.5 3"/><path d="M4 8C5.2 6.7 6.5 6 8 6s2.8.7 4 2"/></svg>
+      <svg width="25" height="12" viewBox="0 0 25 12" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="0" y="1" width="21" height="10" rx="2.5"/><rect x="22" y="3.5" width="2" height="5" rx="1" fill="currentColor" opacity="0.5"/><rect x="1.5" y="2.5" width="16" height="7" rx="1.5" fill="currentColor"/></svg>
+    </div>
+  </div>
+
+  <!-- Floating Navigation Controls -->
+  <div class="floating-nav">
+    <a href="04-home-cliente.html" class="floating-btn" data-nav-back aria-label="Volver">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+    </a>
+    <div style="display: flex; gap: var(--sp-2);">
+      <button class="floating-btn js-fav" type="button" aria-label="Guardar en favoritos" aria-pressed="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Scrollable View -->
+  <div class="screen-content no-header no-tabbar">
+    
+    <!-- Hero Image Carousel (Interactive Scroll-Snap) -->
+    <div class="carousel-wrapper">
+      <div class="carousel-track">
+        <div class="carousel-slide photo-placeholder-cool">
+          <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+        </div>
+        <div class="carousel-slide photo-placeholder-warm">
+          <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+        </div>
+        <div class="carousel-slide photo-placeholder-teal">
+          <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+        </div>
+      </div>
+      <div class="carousel-dots carousel-dots-overlay">
+        <div class="carousel-dot active"></div>
+        <div class="carousel-dot"></div>
+        <div class="carousel-dot"></div>
+      </div>
+    </div>
+
+    <!-- Detail Sheet -->
+    <div class="detail-sheet">
+      <!-- Header row -->
+      <div class="detail-header-row">
+        <div>
+          <h1 class="detail-title">Taladro percutor Bosch GSB 18V</h1>
+          <div style="font-size:var(--text-xs); color:var(--text-tertiary); margin-top:2px;">Inalámbrico · Profesional</div>
+        </div>
+        <div class="detail-price-box">
+          <div class="detail-price-main">S/ 35</div>
+          <div class="detail-price-sub">por día</div>
+        </div>
+      </div>
+
+      <!-- Metadata row -->
+      <div class="detail-meta-row">
+        <div class="detail-meta-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          0.8 km · Surco
+        </div>
+        <span>·</span>
+        <div class="detail-meta-item" style="color:var(--brand-warning); font-weight:600;">
+          <svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          4.8 (24 reseñas)
+        </div>
+      </div>
+
+      <!-- Chips -->
+      <div class="detail-chips">
+        <span class="chip chip-brand">Percutor</span>
+        <span class="chip chip-brand">18V Litio</span>
+        <span class="chip chip-brand">2 Baterías</span>
+        <span class="chip chip-muted">Mandril 13mm</span>
+      </div>
+
+      <!-- Description -->
+      <div style="margin-bottom: var(--sp-5);">
+        <div class="section-title" style="margin-bottom: var(--sp-2);">Descripción</div>
+        <p style="font-size: var(--text-sm); color: var(--text-secondary); line-height: var(--leading-relaxed);">
+          Taladro inalámbrico Bosch de alto rendimiento para concreto, madera y metal. Incluye dos baterías de 4.0Ah con cargador rápido, maletín de transporte y juego de brocas estándar de regalo. Mantenimiento al día y estado impecable.
+        </p>
+      </div>
+
+      <!-- Provider card -->
+      <div style="margin-bottom: var(--sp-5);">
+        <div class="section-title" style="margin-bottom: var(--sp-2);">Proveedor del equipo</div>
+        <a href="20-perfil-usuario.html" class="card card-row" style="text-decoration: none;">
+          <div class="avatar avatar-md avatar-gradient-3">CM</div>
+          <div style="flex:1;">
+            <div style="font-weight:600; font-size:var(--text-base); color:var(--text-primary); display:flex; align-items:center; gap:6px;">
+              Carlos Morales
+              <span class="verified-badge"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>
+            </div>
+            <div style="font-size:var(--text-xs); color:var(--text-tertiary); margin-top:2px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="none" style="vertical-align:-1px;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> 4.9 · 38 alquileres completados</div>
+          </div>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text-tertiary)" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+        </a>
+      </div>
+
+      <!-- Date selector -->
+      <div style="margin-bottom: var(--sp-5);">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:var(--sp-2);">
+          <div class="section-title">Fechas de reserva</div>
+          <span style="font-size:var(--text-xs); color:var(--brand-primary); font-weight:600;">3 días seleccionados</span>
+        </div>
+
+        <div class="cal-week">
+          <div class="cal-day disabled">
+            <span class="cal-day-name">Jue</span>
+            <span class="cal-day-num">23</span>
+          </div>
+          <div class="cal-day disabled">
+            <span class="cal-day-name">Vie</span>
+            <span class="cal-day-num">24</span>
+          </div>
+          <div class="cal-day selected">
+            <span class="cal-day-name">Sáb</span>
+            <span class="cal-day-num">25</span>
+          </div>
+          <div class="cal-day selected">
+            <span class="cal-day-name">Dom</span>
+            <span class="cal-day-num">26</span>
+          </div>
+          <div class="cal-day selected">
+            <span class="cal-day-name">Lun</span>
+            <span class="cal-day-num">27</span>
+          </div>
+          <div class="cal-day">
+            <span class="cal-day-name">Mar</span>
+            <span class="cal-day-num">28</span>
+          </div>
+          <div class="cal-day">
+            <span class="cal-day-name">Mié</span>
+            <span class="cal-day-num">29</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cost Breakdown Box -->
+      <div class="cost-card">
+        <div style="font-size:var(--text-sm); font-weight:700; color:var(--text-primary); margin-bottom:6px;">Resumen del costo estimado</div>
+        <div class="cost-row">
+          <span>Alquiler (3 días × S/ 35)</span>
+          <span style="font-weight:600; color:var(--text-primary);">S/ 105.00</span>
+        </div>
+        <div class="cost-row">
+          <span>Comisión Alki (12%)</span>
+          <span style="font-weight:600; color:var(--text-primary);">S/ 12.60</span>
+        </div>
+        <div class="cost-row">
+          <span>Seguro de protección básico</span>
+          <span style="font-weight:600; color:var(--text-primary);">S/ 8.00</span>
+        </div>
+        <div class="cost-row total">
+          <span>Total a pagar</span>
+          <span>S/ 125.60</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Fixed Bottom Actions Bar -->
+  <div class="bottom-action-bar">
+    <a href="10-confirmacion-pago.html" class="btn btn-primary">
+      Reservar ahora (S/ 125.60)
+    </a>
+    <a href="11-chats-lista.html" class="btn btn-ghost" style="height:44px; font-size:var(--text-sm);">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.5 8.5 0 0 1 8 8v.5z"/></svg>
+      Chatear con el proveedor
+    </a>
+  </div>
+</div>
+
+<script src="shared.js"></script>
+<script>
+  (function () {
+    var fav = document.querySelector('.js-fav');
+    if (!fav) return;
+    fav.addEventListener('click', function () {
+      var on = fav.classList.toggle('is-fav');
+      fav.setAttribute('aria-pressed', String(on));
+      fav.setAttribute('aria-label', on ? 'Quitar de favoritos' : 'Guardar en favoritos');
+    });
+  })();
+</script>
+</body>
+</html>

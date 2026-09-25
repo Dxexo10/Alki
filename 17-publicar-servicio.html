@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Alki - Publicar Disponibilidad de Servicio</title>
+<link rel="stylesheet" href="design-system.css">
+  <style>
+a { text-decoration: none; }
+.nav-action { font-size: 14px; font-weight: 600; color: var(--brand-primary); }
+
+/* Scrollable Content */
+.content {
+  padding: 16px;
+  display: flex; flex-direction: column; gap: 20px;
+}
+
+/* Forms & Cards (names are local to avoid clashing with design-system .card/.input-row/.input-label) */
+.form-card {
+  background: var(--bg-secondary); border-radius: 16px;
+  padding: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+.form-group {
+  background: var(--bg-secondary); border-radius: 16px;
+  overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+.field-row {
+  display: flex; flex-direction: column; gap: 6px; padding: 16px;
+  border-bottom: 1px solid var(--border-default);
+}
+.field-row:last-child { border-bottom: none; }
+.field-label { font-size: 13px; color: var(--text-secondary); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+.input-field {
+  border: none; background: transparent; font-size: 16px; color: var(--text-primary);
+  font-family: inherit; width: 100%; outline: none;
+}
+.textarea-field {
+  border: none; background: transparent; font-size: 16px; color: var(--text-primary);
+  font-family: inherit; width: 100%; resize: none; outline: none; min-height: 60px;
+}
+
+/* Category Selector */
+.cat-header {
+  display: flex; align-items: center; gap: 12px; padding-bottom: 12px; border-bottom: 1px solid var(--border-default);
+}
+.cat-icon { width: 40px; height: 40px; background: var(--bg-primary); color: var(--brand-primary); border-radius: 12px; display: flex; align-items: center; justify-content: center; }
+.cat-title { flex: 1; font-size: 16px; font-weight: 600; color: var(--text-primary); }
+.scroll-row { display: flex; gap: 10px; overflow-x: auto; padding-top: 12px; padding-bottom: 4px; scrollbar-width: none; }
+.scroll-row::-webkit-scrollbar { display: none; }
+.scroll-chip {
+  padding: 8px 16px; border-radius: 99px; font-size: 14px; font-weight: 600;
+  background: var(--bg-primary); color: var(--text-secondary); white-space: nowrap; border: 1px solid transparent; cursor: pointer;
+}
+.scroll-chip.active { background: var(--brand-accent-soft); color: var(--brand-primary); border-color: var(--brand-primary); }
+
+/* Pricing Segmented */
+.segmented-control {
+  display: flex; background: var(--bg-primary); border-radius: 8px;
+  padding: 4px; margin-top: 8px;
+}
+.segment {
+  flex: 1; text-align: center; font-size: 13px; font-weight: 600; padding: 8px 0;
+  color: var(--text-secondary); border-radius: 6px; cursor: pointer;
+}
+.segment.active { background: var(--bg-secondary); color: var(--text-primary); box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+
+/* Multi-select chips (Zones & Days) */
+.chip-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.chip-select {
+  padding: 8px 16px; border-radius: 99px; font-size: 14px; font-weight: 600;
+  background: var(--bg-primary); color: var(--text-secondary);
+  display: inline-flex; align-items: center; gap: 6px; border: 1px solid transparent; cursor: pointer; transition: all 0.2s;
+}
+.chip-select input { display: none; }
+.chip-select:has(input:checked) {
+  background: var(--brand-accent-soft); border-color: var(--brand-primary); color: var(--brand-primary);
+}
+.check-icon { display: none; width: 14px; height: 14px; }
+.chip-select:has(input:checked) .check-icon { display: block; }
+
+/* Stepper */
+.stepper { display: flex; align-items: center; justify-content: center; gap: 16px; margin-top: 16px; background: var(--bg-primary); padding: 12px; border-radius: 12px; }
+.step-btn { width: 32px; height: 32px; border-radius: 50%; background: var(--bg-secondary); border: none; font-size: 20px; color: var(--brand-primary); box-shadow: 0 2px 4px rgba(0,0,0,0.1); cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.step-val { font-size: 15px; font-weight: 600; color: var(--text-primary); }
+
+/* Time inputs */
+.time-inputs { display: flex; gap: 12px; margin-top: 12px; }
+.time-input { flex: 1; padding: 12px; background: var(--bg-primary); border-radius: 12px; font-size: 15px; color: var(--text-primary); border: none; outline: none; text-align: center; font-weight: 600; }
+
+/* Photos (same component as 13-publicar-herramienta) */
+.photo-scroll { display: flex; gap: var(--sp-3); overflow-x: auto; padding: var(--sp-2) 0; scrollbar-width: none; }
+.photo-scroll::-webkit-scrollbar { display: none; }
+.photo-slot {
+  width: 80px; height: 80px; border-radius: var(--radius-lg);
+  flex-shrink: 0; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  cursor: pointer; transition: transform 100ms ease; position: relative;
+}
+.photo-slot:active { transform: scale(0.95); }
+.photo-slot.filled {
+  background: linear-gradient(135deg, var(--holst-2), var(--holst-1));
+  color: var(--text-on-brand);
+}
+.photo-slot.empty {
+  border: 1.5px dashed var(--border-default);
+  background: var(--bg-secondary);
+  color: var(--text-tertiary);
+}
+.photo-slot.empty:hover { border-color: var(--brand-primary); color: var(--brand-primary); }
+
+/* Toggle */
+.toggle-row { display: flex; align-items: center; justify-content: space-between; padding: 16px; }
+.toggle-label { font-size: 15px; color: var(--text-primary); font-weight: 600; display: flex; align-items: center; gap: 8px; }
+.switch { width: 50px; height: 30px; background: var(--brand-primary); border-radius: 15px; position: relative; cursor: pointer; flex-shrink: 0; }
+.switch::after { content: ''; position: absolute; top: 2px; right: 2px; width: 26px; height: 26px; background: var(--bg-secondary); border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+
+/* Fixed Bottom (shared .bottom-action-bar component, same as 13) */
+.btn-primary {
+  width: 100%; height: 54px; border-radius: 99px; background: var(--brand-primary);
+  color: var(--text-on-brand); font-size: 16px; font-weight: 600; border: none; display: flex; align-items: center; justify-content: center;
+  transition: transform 0.1s; cursor: pointer; text-decoration: none;
+}
+.btn-primary:active { transform: scale(0.97); }
+.btn-primary.is-disabled { opacity: 0.45; }
+.field-row.is-invalid { box-shadow: inset 3px 0 0 var(--brand-error); }
+.error-msg { display: none; font-size: var(--text-xs); color: var(--brand-error); font-weight: 600; margin-top: 6px; }
+.error-msg.show { display: block; }
+
+  </style>
+</head>
+<body>
+<div class="phone">
+  <div class="dynamic-island"></div>
+  <div class="status-bar" style="color: var(--text-primary);">
+    <span class="status-time">9:41</span>
+    <div class="status-icons">
+      <svg width="17" height="12" viewBox="0 0 17 12" fill="currentColor"><rect x="0" y="6" width="3" height="6" rx="0.8"/><rect x="4.5" y="4" width="3" height="8" rx="0.8"/><rect x="9" y="2" width="3" height="10" rx="0.8"/><rect x="13.5" y="0" width="3" height="12" rx="0.8"/></svg>
+      <svg width="16" height="12" viewBox="0 0 16 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M8 9.5a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3z" fill="currentColor"/><path d="M1.5 5.5C3.4 3.5 5.6 2.5 8 2.5s4.6 1 6.5 3"/><path d="M4 8C5.2 6.7 6.5 6 8 6s2.8.7 4 2"/></svg>
+      <svg width="25" height="12" viewBox="0 0 25 12" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="0" y="1" width="21" height="10" rx="2.5"/><rect x="22" y="3.5" width="2" height="5" rx="1" fill="currentColor" opacity="0.5"/><rect x="1.5" y="2.5" width="16" height="7" rx="1.5" fill="currentColor"/></svg>
+    </div>
+  </div>
+
+  <header class="nav-header">
+    <a href="16-home-proveedor-servicios.html" class="nav-btn back" data-nav-back aria-label="Volver">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+    </a>
+    <h1 class="nav-title">Nuevo servicio</h1>
+    <a href="#" class="nav-action">Guardar</a>
+  </header>
+
+  <div class="screen-content no-tabbar content">
+    <!-- Category Selector -->
+    <div class="form-card">
+      <div class="cat-header">
+        <div class="cat-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+        </div>
+        <div class="cat-title">Electricidad residencial</div>
+        <div style="color:var(--text-secondary)">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+      </div>
+      <div class="scroll-row">
+        <div class="scroll-chip">Tableros</div>
+        <div class="scroll-chip active">Tomacorrientes</div>
+        <div class="scroll-chip">Luminarias</div>
+        <div class="scroll-chip">Automatización</div>
+      </div>
+    </div>
+
+    <!-- Basic Info -->
+    <div class="form-group">
+      <div class="field-row">
+        <span class="field-label">Título del servicio</span>
+        <input type="text" id="s-title" class="input-field" value="Electricista residencial certificado">
+        <div class="error-msg" id="e-title"></div>
+      </div>
+      <div class="field-row">
+        <span class="field-label">Descripción</span>
+        <textarea id="s-desc" class="textarea-field">Electricista con 8 años de experiencia en instalaciones domésticas y solución de averías. Trabajo rápido y garantizado.</textarea>
+        <div class="error-msg" id="e-desc"></div>
+      </div>
+      <div class="field-row">
+        <span class="field-label">Certificación / Especialidad</span>
+        <input type="text" class="input-field" value="SENATI - Técnico en electricidad">
+      </div>
+    </div>
+
+    <!-- Pricing -->
+    <div class="form-group">
+      <div class="field-row">
+        <span class="field-label">Precio base</span>
+        <input type="text" id="s-price" class="input-field" value="S/ 80/hora">
+        <div class="error-msg" id="e-price"></div>
+      </div>
+      <div class="field-row">
+        <span class="field-label">Precio máximo referencial</span>
+        <input type="text" class="input-field" value="S/ 150">
+      </div>
+      <div class="field-row">
+        <span class="field-label">Modalidad</span>
+        <div class="segmented-control">
+          <div class="segment active">Por hora</div>
+          <div class="segment">Por servicio</div>
+          <div class="segment">A acordar</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Coverage Zone -->
+    <div class="form-card">
+      <span class="field-label">Zona de cobertura</span>
+      <div class="chip-grid" id="zonesGrid">
+        <label class="chip-select">
+          <input type="checkbox" checked>
+          <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          Miraflores
+        </label>
+        <label class="chip-select">
+          <input type="checkbox" checked>
+          <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          San Isidro
+        </label>
+        <label class="chip-select">
+          <input type="checkbox" checked>
+          <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          Surco
+        </label>
+        <label class="chip-select">
+          <input type="checkbox">
+          <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          San Borja
+        </label>
+        <label class="chip-select">
+          <input type="checkbox">
+          <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          La Molina
+        </label>
+      </div>
+      <div class="error-msg" id="e-zones"></div>
+      <div class="stepper">
+        <button class="step-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
+        <span class="step-val">Radio: 10 km</span>
+        <button class="step-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
+      </div>
+    </div>
+
+    <!-- Availability -->
+    <div class="form-card">
+      <span class="field-label">Días disponibles</span>
+      <div class="chip-grid" id="daysGrid">
+        <label class="chip-select">
+          <input type="checkbox" checked>
+          <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          Lun
+        </label>
+        <label class="chip-select">
+          <input type="checkbox" checked>
+          <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          Mar
+        </label>
+        <label class="chip-select">
+          <input type="checkbox" checked>
+          <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          Mié
+        </label>
+        <label class="chip-select">
+          <input type="checkbox" checked>
+          <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          Jue
+        </label>
+        <label class="chip-select">
+          <input type="checkbox" checked>
+          <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          Vie
+        </label>
+        <label class="chip-select">
+          <input type="checkbox" checked>
+          <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          Sáb
+        </label>
+        <label class="chip-select">
+          <input type="checkbox">
+          <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          Dom
+        </label>
+      </div>
+      <div class="error-msg" id="e-days"></div>
+      <div style="margin-top: 20px;">
+        <span class="field-label">Horario</span>
+        <div class="time-inputs">
+          <input type="text" class="time-input" value="8:00 AM">
+          <span style="display:flex; align-items:center; color:var(--text-secondary); font-weight:600;">a</span>
+          <input type="text" class="time-input" value="7:00 PM">
+        </div>
+      </div>
+    </div>
+
+    <!-- Photos -->
+    <div class="form-card">
+      <span class="field-label">Fotos de trabajos anteriores (hasta 4)</span>
+      <div class="photo-scroll">
+        <div class="photo-slot filled">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+          <span style="font-size:10px; margin-top:4px;">Portada</span>
+        </div>
+        <div class="photo-slot filled">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+        </div>
+        <div class="photo-slot empty">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </div>
+        <div class="photo-slot empty">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scheduling -->
+    <div class="form-group">
+      <div class="toggle-row">
+        <span class="toggle-label">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          Acepto agendar citas previas
+        </span>
+        <div class="switch"></div>
+      </div>
+      <div class="field-row" style="background:var(--bg-primary)">
+        <span class="field-label">Tiempo mínimo de aviso</span>
+        <input type="text" class="input-field" value="2 horas">
+      </div>
+    </div>
+
+  </div>
+
+  <div class="bottom-action-bar">
+    <a href="16-home-proveedor-servicios.html" class="btn-primary is-disabled" aria-disabled="true">Publicar servicio</a>
+  </div>
+</div>
+<script src="shared.js"></script>
+<script>
+  (function () {
+    var title = document.getElementById('s-title');
+    var desc = document.getElementById('s-desc');
+    var price = document.getElementById('s-price');
+    var zones = document.getElementById('zonesGrid');
+    var days = document.getElementById('daysGrid');
+    var btn = document.querySelector('.btn-primary');
+    var touched = {};
+
+    function anyChecked(grid) { return !!grid.querySelector('input[type="checkbox"]:checked'); }
+
+    function setField(el, id, m) {
+      var box = document.getElementById(id);
+      var row = el.closest('.field-row');
+      if (row) row.classList.toggle('is-invalid', !!m);
+      if (m) { box.textContent = m; box.classList.add('show'); }
+      else { box.textContent = ''; box.classList.remove('show'); }
+    }
+    function setGroup(id, m) {
+      var box = document.getElementById(id);
+      if (m) { box.textContent = m; box.classList.add('show'); }
+      else { box.textContent = ''; box.classList.remove('show'); }
+    }
+
+    function render() {
+      var okTitle = title.value.trim() !== '';
+      var okDesc = desc.value.trim() !== '';
+      var okPrice = price.value.trim() !== '';
+      var okZones = anyChecked(zones);
+      var okDays = anyChecked(days);
+      var ok = okTitle && okDesc && okPrice && okZones && okDays;
+
+      setField(title, 'e-title', (touched.title && !okTitle) ? 'Ingresa un título' : '');
+      setField(desc, 'e-desc', (touched.desc && !okDesc) ? 'Ingresa una descripción' : '');
+      setField(price, 'e-price', (touched.price && !okPrice) ? 'Ingresa un precio base' : '');
+      setGroup('e-zones', (touched.zones && !okZones) ? 'Selecciona al menos una zona' : '');
+      setGroup('e-days', (touched.days && !okDays) ? 'Selecciona al menos un día' : '');
+
+      btn.classList.toggle('is-disabled', !ok);
+      btn.setAttribute('aria-disabled', String(!ok));
+      return ok;
+    }
+
+    [{ el: title, k: 'title' }, { el: desc, k: 'desc' }, { el: price, k: 'price' }].forEach(function (f) {
+      f.el.addEventListener('input', render);
+      f.el.addEventListener('blur', function () { touched[f.k] = true; render(); });
+    });
+    zones.addEventListener('change', function () { touched.zones = true; render(); });
+    days.addEventListener('change', function () { touched.days = true; render(); });
+    btn.addEventListener('click', function (e) {
+      if (!render()) {
+        touched.title = touched.desc = touched.price = touched.zones = touched.days = true;
+        render();
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+      }
+      e.preventDefault();
+      e.stopPropagation();
+      if (window.rsShowToast) window.rsShowToast('Servicio publicado');
+      setTimeout(function () { window.location.href = '16-home-proveedor-servicios.html'; }, 1300);
+    });
+    render();
+  })();
+</script>
+</body>
+</html>
